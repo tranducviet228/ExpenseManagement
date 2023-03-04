@@ -1,0 +1,31 @@
+server:
+  port: 8079
+spring:
+  datasource:
+    password: 11111111
+    url: jdbc:postgresql://localhost:5432/expense_management
+    username: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+twilio:
+  accountSid: AC3557419b52af05ad7ea9293318126335
+  authToken: 7bd26f68d12cb733e9bd9908445a6383
+viet:
+  app:
+    jwtExpirationMs: 600000
+    jwtRefreshExpirationMs: 86400000
+    jwtSecret: helohehehihi
+
+email:
+  fromEmail: bookingcare666@gmail.com
+  password: bmoqhrufffwexozg
