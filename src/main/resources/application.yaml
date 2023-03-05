@@ -1,5 +1,5 @@
 server:
-  port: 8079
+  port: 8081
 spring:
   datasource:
     password: 11111111
@@ -17,9 +17,13 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
-twilio:
-  accountSid: AC3557419b52af05ad7ea9293318126335
-  authToken: 7bd26f68d12cb733e9bd9908445a6383
+
+  messages:
+    basename: i18n/messages
+  web:
+    locale: vi
+    locale-resolver: fixed
+
 viet:
   app:
     jwtExpirationMs: 600000
@@ -29,3 +33,6 @@ viet:
 email:
   fromEmail: bookingcare666@gmail.com
   password: bmoqhrufffwexozg
+
+
+

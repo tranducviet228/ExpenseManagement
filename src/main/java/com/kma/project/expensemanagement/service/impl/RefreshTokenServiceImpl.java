@@ -1,9 +1,14 @@
 package com.kma.project.expensemanagement.service.impl;
 
+import com.kma.project.expensemanagement.dto.request.TokenRefreshRequest;
+import com.kma.project.expensemanagement.dto.response.TokenRefreshResponse;
 import com.kma.project.expensemanagement.entity.RefreshToken;
+import com.kma.project.expensemanagement.entity.UserEntity;
+import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.handler.TokenRefreshException;
 import com.kma.project.expensemanagement.repository.RefreshTokenRepository;
 import com.kma.project.expensemanagement.repository.UserRepository;
+import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,6 +33,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }
@@ -34,8 +43,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Transactional
     public RefreshToken createRefreshToken(String username) {
         RefreshToken refreshToken = new RefreshToken();
-
-        refreshToken.setUser(userRepository.findByUsername(username).get());
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.username-not-found")).build());
+        refreshToken.setUser(userEntity);
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         refreshToken.setToken(UUID.randomUUID().toString());
 
@@ -43,6 +53,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshToken;
     }
 
+    @Transactional
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
@@ -50,5 +61,20 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         }
 
         return token;
+    }
+
+    @Override
+    public TokenRefreshResponse refreshToken(TokenRefreshRequest refreshRequest) {
+        String requestRefreshToken = refreshRequest.getRefreshToken();
+
+        return findByToken(requestRefreshToken)
+                .map(this::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = "Bearer " + jwtUtils.generateTokenFromUsername(user.getUsername());
+                    return new TokenRefreshResponse(token, requestRefreshToken);
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                        "Refresh token is not in database!"));
     }
 }

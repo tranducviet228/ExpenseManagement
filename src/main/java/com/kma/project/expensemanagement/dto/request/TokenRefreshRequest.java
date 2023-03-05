@@ -4,7 +4,7 @@ import javax.validation.constraints.NotBlank;
 
 public class TokenRefreshRequest {
 
-    @NotBlank
+    @NotBlank(message = "{error.refresh-token-not-null}")
     private String refreshToken;
 
     public String getRefreshToken() {

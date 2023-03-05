@@ -36,6 +36,8 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<RoleEntity> roles;
 
+    private String otp;
+
     public UserEntity(String username, String email, String encode) {
         this.username = username;
         this.email = email;
