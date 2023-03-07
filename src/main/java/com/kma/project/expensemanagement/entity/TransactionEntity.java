@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transactions")
-public class TransactionEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class TransactionEntity extends BaseEntity {
 
     @Column(name = "amount")
     private Long amount;
@@ -43,17 +39,17 @@ public class TransactionEntity {
     @Column(name = "image")
     private String image;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @Column(name = "created_by")
-    private Long createdBy;
-
-    @Column(name = "updated_by")
-    private Long updatedBy;
+//    @Column(name = "created_at", nullable = false)
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "updated_at", nullable = false)
+//    private LocalDateTime updatedAt;
+//
+//    @Column(name = "created_by")
+//    private Long createdBy;
+//
+//    @Column(name = "updated_by")
+//    private Long updatedBy;
 
     // Constructor, getters and setters
 }

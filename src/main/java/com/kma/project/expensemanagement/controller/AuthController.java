@@ -1,8 +1,6 @@
 package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.request.*;
-import com.kma.project.expensemanagement.dto.response.MessageResponse;
-import com.kma.project.expensemanagement.repository.UserRepository;
 import com.kma.project.expensemanagement.service.MailService;
 import com.kma.project.expensemanagement.service.RefreshTokenService;
 import com.kma.project.expensemanagement.service.UserService;
@@ -29,8 +27,6 @@ public class AuthController {
     @Autowired
     UserService userService;
 
-    @Autowired
-    UserRepository userRepository;
 
     @ApiOperation(value = "Đăng nhập")
     @PostMapping("/sign-in")
@@ -41,8 +37,7 @@ public class AuthController {
     @ApiOperation(value = "Đăng kí")
     @PostMapping("/sign-up")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest request) {
-        userService.signUp(request);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.ok(userService.signUp(request));
     }
 
     @ApiOperation(value = "Refresh token")

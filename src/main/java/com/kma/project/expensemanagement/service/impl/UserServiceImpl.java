@@ -7,6 +7,7 @@ import com.kma.project.expensemanagement.entity.RoleEntity;
 import com.kma.project.expensemanagement.entity.UserEntity;
 import com.kma.project.expensemanagement.enums.ERole;
 import com.kma.project.expensemanagement.exception.AppException;
+import com.kma.project.expensemanagement.exception.AppResponseDto;
 import com.kma.project.expensemanagement.repository.RoleRepository;
 import com.kma.project.expensemanagement.repository.UserRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
@@ -48,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void signUp(SignUpRequest signUpRequest) {
+    public AppResponseDto signUp(SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             throw AppException.builder().errorCodes(Collections.singletonList("error.username-exist")).build();
         }
@@ -67,13 +68,19 @@ public class UserServiceImpl implements UserService {
         roles.add(userRole);
         user.setRoles(roles);
         userRepository.save(user);
+        return AppResponseDto.builder().httpStatus(200).message("Đăng kí thành công").build();
     }
 
     @Transactional
     @Override
-    public JwtResponse signIn(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+    public AppResponseDto signIn(LoginRequest loginRequest) {
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        } catch (Exception e) {
+            throw AppException.builder().errorCodes(Collections.singletonList("error.login-fail")).build();
+        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = "Bearer " + jwtUtils.generateJwtToken(authentication);
@@ -84,13 +91,14 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
-
-        return JwtResponse.builder()
+        JwtResponse jwtResponse = JwtResponse.builder()
                 .refreshToken(refreshToken.getToken())
                 .id(userDetails.getId())
                 .username(userDetails.getUsername())
                 .email(userDetails.getEmail())
                 .accessToken(jwt).build();
+        return AppResponseDto.builder().data(jwtResponse).httpStatus(200).message("Đăng nhập thành công").build();
+
     }
 
     @Override

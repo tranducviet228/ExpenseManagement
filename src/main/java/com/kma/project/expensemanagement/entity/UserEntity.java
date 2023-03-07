@@ -18,11 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserEntity extends BaseEntity {
 
     private String username;
 
@@ -43,4 +39,16 @@ public class UserEntity {
         this.email = email;
         this.password = encode;
     }
+
+    //    @Column(name = "created_at", nullable = false)
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "updated_at", nullable = false)
+//    private LocalDateTime updatedAt;
+//
+//    @Column(name = "created_by")
+//    private Long createdBy;
+//
+//    @Column(name = "updated_by")
+//    private Long updatedBy;
 }

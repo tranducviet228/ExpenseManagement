@@ -18,6 +18,7 @@ public class AppResponseDto<T> {
     private Integer httpStatus;
     private List<AppExceptionError> errors;
     private T data;
+    private String message;
 
     public static AppResponseDto fromError(int httpStatus, AppException appException) {
         return AppResponseDto.builder()

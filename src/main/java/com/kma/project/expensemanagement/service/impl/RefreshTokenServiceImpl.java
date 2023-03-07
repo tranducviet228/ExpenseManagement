@@ -5,7 +5,7 @@ import com.kma.project.expensemanagement.dto.response.TokenRefreshResponse;
 import com.kma.project.expensemanagement.entity.RefreshToken;
 import com.kma.project.expensemanagement.entity.UserEntity;
 import com.kma.project.expensemanagement.exception.AppException;
-import com.kma.project.expensemanagement.handler.TokenRefreshException;
+import com.kma.project.expensemanagement.exception.TokenRefreshException;
 import com.kma.project.expensemanagement.repository.RefreshTokenRepository;
 import com.kma.project.expensemanagement.repository.UserRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
