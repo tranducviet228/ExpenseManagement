@@ -1,12 +1,23 @@
 package com.kma.project.expensemanagement.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
 @Entity
+@DynamicUpdate
 @Table(name = "categories")
-public class CategoryEntity extends BaseEntity {
+public class CategoryEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
 
     @Column(name = "name")
     private String name;
@@ -20,19 +31,13 @@ public class CategoryEntity extends BaseEntity {
     @Column(name = "is_pay")
     private boolean isPay;
 
-    @Column(name = "logo_image")
-    private String logoImage;
+    @Column(name = "logo_image_id")
+    private Long logoImageID;
 
-//    @Column(name = "created_at", nullable = false)
-//    private LocalDateTime createdAt;
-//
-//    @Column(name = "updated_at", nullable = false)
-//    private LocalDateTime updatedAt;
-//
-//    @Column(name = "created_by")
-//    private Long createdBy;
-//
-//    @Column(name = "updated_by")
-//    private Long updatedBy;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
 }

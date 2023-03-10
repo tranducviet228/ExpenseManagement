@@ -27,9 +27,11 @@ public abstract class BaseEntity implements Serializable {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
 //        this.createdBy =
     }
 
+    @PreUpdate
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();
         //

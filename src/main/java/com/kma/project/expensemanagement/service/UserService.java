@@ -1,6 +1,6 @@
 package com.kma.project.expensemanagement.service;
 
-import com.kma.project.expensemanagement.dto.request.*;
+import com.kma.project.expensemanagement.dto.authen.*;
 import com.kma.project.expensemanagement.exception.AppResponseDto;
 
 public interface UserService {

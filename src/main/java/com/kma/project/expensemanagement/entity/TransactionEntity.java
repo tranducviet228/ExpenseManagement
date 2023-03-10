@@ -36,20 +36,8 @@ public class TransactionEntity extends BaseEntity {
     @Column(name = "transaction_type")
     private String transactionType;
 
+    @Lob
     @Column(name = "image")
-    private String image;
+    private byte[] image;
 
-//    @Column(name = "created_at", nullable = false)
-//    private LocalDateTime createdAt;
-//
-//    @Column(name = "updated_at", nullable = false)
-//    private LocalDateTime updatedAt;
-//
-//    @Column(name = "created_by")
-//    private Long createdBy;
-//
-//    @Column(name = "updated_by")
-//    private Long updatedBy;
-
-    // Constructor, getters and setters
 }

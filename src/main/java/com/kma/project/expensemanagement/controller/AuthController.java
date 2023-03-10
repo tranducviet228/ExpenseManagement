@@ -1,9 +1,10 @@
 package com.kma.project.expensemanagement.controller;
 
-import com.kma.project.expensemanagement.dto.request.*;
+import com.kma.project.expensemanagement.dto.authen.*;
 import com.kma.project.expensemanagement.service.MailService;
 import com.kma.project.expensemanagement.service.RefreshTokenService;
 import com.kma.project.expensemanagement.service.UserService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
+@Api(tags = "Quản lí tài khoản, đăng nhập, đăng kí")
 public class AuthController {
 
     @Autowired

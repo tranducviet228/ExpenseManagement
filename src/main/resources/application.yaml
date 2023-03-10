@@ -26,9 +26,12 @@ spring:
 
 viet:
   app:
-    jwtExpirationMs: 600000
+    jwtExpirationMs: 6000000
     jwtRefreshExpirationMs: 86400000
     jwtSecret: helohehehihi
+    cloud_name: drul2rlhe
+    api_key: 624968573896295
+    api_secret: wJchJWfJ8iUNXsYVoM__61YaTzI
 
 email:
   fromEmail: bookingcare666@gmail.com

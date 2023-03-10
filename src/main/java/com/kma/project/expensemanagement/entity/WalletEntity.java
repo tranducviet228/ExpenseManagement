@@ -7,6 +7,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "wallets")
 public class WalletEntity extends BaseEntity {
+
     @Column(name = "account_balance")
     private Long accountBalance;
 

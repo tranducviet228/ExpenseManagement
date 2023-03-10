@@ -1,7 +1,7 @@
 package com.kma.project.expensemanagement.service.impl;
 
-import com.kma.project.expensemanagement.dto.request.TokenRefreshRequest;
-import com.kma.project.expensemanagement.dto.response.TokenRefreshResponse;
+import com.kma.project.expensemanagement.dto.authen.TokenRefreshRequest;
+import com.kma.project.expensemanagement.dto.authen.TokenRefreshResponse;
 import com.kma.project.expensemanagement.entity.RefreshToken;
 import com.kma.project.expensemanagement.entity.UserEntity;
 import com.kma.project.expensemanagement.exception.AppException;

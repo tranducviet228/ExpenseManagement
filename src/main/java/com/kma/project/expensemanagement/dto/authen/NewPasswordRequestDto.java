@@ -1,4 +1,4 @@
-package com.kma.project.expensemanagement.dto.request;
+package com.kma.project.expensemanagement.dto.authen;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -11,10 +11,7 @@ import javax.validation.constraints.Size;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ChangePasswordRequestDto {
-
-    @NotBlank(message = "{error.current-password-not-null}")
-    private String currentPassword;
+public class NewPasswordRequestDto {
 
     @NotBlank(message = "{error.password-not-null}")
     @Size(min = 6, max = 40, message = "{error.password-not-valid}")
@@ -23,5 +20,7 @@ public class ChangePasswordRequestDto {
     @NotBlank(message = "{error.confirm-password-not-null}")
     private String confirmPassword;
 
+    @NotBlank(message = "{error.email-not-null}")
+    private String email;
 
 }

@@ -1,4 +1,4 @@
-package com.kma.project.expensemanagement.dto.request;
+package com.kma.project.expensemanagement.dto.authen;
 
 import lombok.Getter;
 import lombok.Setter;
