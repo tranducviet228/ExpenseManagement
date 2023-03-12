@@ -2,6 +2,7 @@ package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.request.CategoryInputDto;
 import com.kma.project.expensemanagement.dto.response.CategoryOutputDto;
+import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.service.CategoryService;
 import io.swagger.annotations.Api;
@@ -31,7 +32,7 @@ public class CategoryController {
 
     @ApiOperation(value = "Lấy chi tiết danh mục thu chi")
     @GetMapping("/{id}")
-    public CategoryOutputDto getDetail(@PathVariable("id") Long id) {
+    public DataResponse<CategoryOutputDto> getDetail(@PathVariable("id") Long id) {
         return categoryService.getDetail(id);
     }
 

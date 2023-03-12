@@ -1,9 +1,18 @@
 package com.kma.project.expensemanagement.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "transactions")
 public class TransactionEntity extends BaseEntity {
 
@@ -36,8 +45,13 @@ public class TransactionEntity extends BaseEntity {
     @Column(name = "transaction_type")
     private String transactionType;
 
-    @Lob
-    @Column(name = "image")
-    private byte[] image;
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
 }

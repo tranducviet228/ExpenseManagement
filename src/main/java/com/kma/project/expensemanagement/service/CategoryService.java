@@ -2,6 +2,7 @@ package com.kma.project.expensemanagement.service;
 
 import com.kma.project.expensemanagement.dto.request.CategoryInputDto;
 import com.kma.project.expensemanagement.dto.response.CategoryOutputDto;
+import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 
 public interface CategoryService {
@@ -12,7 +13,7 @@ public interface CategoryService {
 
     void delete(Long id);
 
-    CategoryOutputDto getDetail(Long id);
+    DataResponse<CategoryOutputDto> getDetail(Long id);
 
     PageResponse<CategoryOutputDto> getAllCategory(Integer page, Integer size, String sort, String search, Long parentId);
 }

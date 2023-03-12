@@ -2,6 +2,7 @@ package com.kma.project.expensemanagement.service.impl;
 
 import com.kma.project.expensemanagement.dto.request.CategoryInputDto;
 import com.kma.project.expensemanagement.dto.response.CategoryOutputDto;
+import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.CategoryLogoEntity;
@@ -11,6 +12,7 @@ import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
 import com.kma.project.expensemanagement.service.CategoryService;
 import com.kma.project.expensemanagement.service.UploadFileService;
+import com.kma.project.expensemanagement.utils.DataUtils;
 import com.kma.project.expensemanagement.utils.PageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,19 +81,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryOutputDto getDetail(Long id) {
+    public DataResponse<CategoryOutputDto> getDetail(Long id) {
         CategoryEntity categoryEntity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.category-not-found")).build());
         CategoryLogoEntity logoEntity = logoRepository.findById(categoryEntity.getLogoImageID())
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.logo-not-found")).build());
         CategoryOutputDto categoryOutputDto = mapper.convertToDto(categoryEntity);
         categoryOutputDto.setLogoImageUrl(logoEntity.getFileUrl());
-        return categoryOutputDto;
+        return DataUtils.formatData(categoryOutputDto);
     }
 
     @Override
     public PageResponse<CategoryOutputDto> getAllCategory(Integer page, Integer size, String sort, String search, Long parentId) {
-        
+
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         parentId = parentId == null ? 0 : parentId;
         Page<CategoryEntity> categoryPage = repository.findAllByNameLikeIgnoreCaseAndParentId(pageable, PageUtils.buildSearch(search), parentId);

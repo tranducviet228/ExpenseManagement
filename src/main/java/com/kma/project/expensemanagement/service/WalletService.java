@@ -1,9 +1,9 @@
 package com.kma.project.expensemanagement.service;
 
 import com.kma.project.expensemanagement.dto.request.WalletInputDto;
+import com.kma.project.expensemanagement.dto.response.DataResponse;
+import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
-
-import java.util.List;
 
 public interface WalletService {
 
@@ -13,7 +13,7 @@ public interface WalletService {
 
     void delete(Long id);
 
-    WalletOutputDto getDetail(Long id);
+    DataResponse<WalletOutputDto> getDetail(Long id);
 
-    List<WalletOutputDto> getAllWallet();
+    PageResponse<WalletOutputDto> getAllWallet(Integer page, Integer size, String sort);
 }
