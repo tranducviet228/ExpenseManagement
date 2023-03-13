@@ -4,6 +4,7 @@ import com.kma.project.expensemanagement.dto.response.CategoryLogoOutputDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.entity.CategoryLogoEntity;
 import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
+import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.CategoryLogoService;
 import com.kma.project.expensemanagement.service.UploadFileService;
 import com.kma.project.expensemanagement.utils.PageUtils;
@@ -27,6 +28,9 @@ public class CategoryLogoServiceImpl implements CategoryLogoService {
     @Autowired
     UploadFileService uploadFileService;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
     @Transactional
     @Override
     public void add(MultipartFile[] files) {
@@ -36,6 +40,8 @@ public class CategoryLogoServiceImpl implements CategoryLogoService {
             categoryLogoEntity.setFileUrl(uploadFileService.uploadFileCloud(file));
             categoryLogoEntity.setFileName(file.getOriginalFilename());
             listLogo.add(categoryLogoEntity);
+            categoryLogoEntity.setCreatedBy(jwtUtils.getCurrentUserId());
+
         }
         logoRepository.saveAll(listLogo);
     }

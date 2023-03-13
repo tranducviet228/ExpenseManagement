@@ -4,16 +4,22 @@ import com.kma.project.expensemanagement.security.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
 public class JwtUtils {
+
+    @Autowired
+    BearerTokenInterceptor bearerTokenInterceptor;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
@@ -53,8 +59,22 @@ public class JwtUtils {
 
     }
 
+    public Long getCurrentUserId() {
+        return Long.valueOf(getUserIdFromJwtToken(bearerTokenInterceptor.getBearerToken()));
+    }
+
     public String getUserIdFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get("userId").toString();
+    }
+
+    private String parseJwt(HttpServletRequest request) {
+        String headerAuth = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7);
+        }
+
+        return null;
     }
 
     public boolean validateJwtToken(String authToken) {

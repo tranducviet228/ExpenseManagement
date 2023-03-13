@@ -10,6 +10,7 @@ import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.CategoryMapper;
 import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
+import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.CategoryService;
 import com.kma.project.expensemanagement.service.UploadFileService;
 import com.kma.project.expensemanagement.utils.DataUtils;
@@ -21,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,14 +46,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     UploadFileService uploadFileService;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
     @Transactional
     @Override
     public CategoryOutputDto add(CategoryInputDto inputDto) {
         CategoryEntity categoryEntity = mapper.convertToEntity(inputDto);
         logoRepository.findById(inputDto.getLogoImageID())
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.logo-not-found")).build());
-        categoryEntity.setUpdatedAt(LocalDateTime.now());
-        categoryEntity.setCreatedAt(LocalDateTime.now());
+        categoryEntity.setCreatedBy(jwtUtils.getCurrentUserId());
         repository.save(categoryEntity);
         return mapper.convertToDto(categoryEntity);
     }

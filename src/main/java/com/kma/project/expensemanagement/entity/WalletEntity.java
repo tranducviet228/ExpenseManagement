@@ -2,17 +2,14 @@ package com.kma.project.expensemanagement.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Data
 @Table(name = "wallets")
-public class WalletEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class WalletEntity extends BaseEntity {
 
     @Column(name = "account_balance")
     private Long accountBalance;
@@ -32,17 +29,4 @@ public class WalletEntity {
     @Column(name = "is_report")
     private boolean isReport;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-//
-//    @Column(name = "created_by")
-//    private Long createdBy;
-//
-//    @Column(name = "updated_by")
-//    private Long updatedBy;
-
-    // Constructor, getters and setters
 }

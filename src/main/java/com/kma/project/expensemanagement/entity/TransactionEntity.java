@@ -48,10 +48,4 @@ public class TransactionEntity extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
 }

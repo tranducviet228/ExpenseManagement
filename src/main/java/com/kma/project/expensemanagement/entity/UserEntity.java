@@ -39,16 +39,4 @@ public class UserEntity extends BaseEntity {
         this.email = email;
         this.password = encode;
     }
-
-    //    @Column(name = "created_at", nullable = false)
-//    private LocalDateTime createdAt;
-//
-//    @Column(name = "updated_at", nullable = false)
-//    private LocalDateTime updatedAt;
-//
-//    @Column(name = "created_by")
-//    private Long createdBy;
-//
-//    @Column(name = "updated_by")
-//    private Long updatedBy;
 }

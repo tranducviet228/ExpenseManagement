@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,14 +11,16 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @MappedSuperclass
+@AllArgsConstructor
 public abstract class BaseEntity implements Serializable {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private LocalDateTime createdAt;
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
     private Long createdBy;
     private Long updateBy;
 
@@ -27,13 +30,13 @@ public abstract class BaseEntity implements Serializable {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        this.updateAt = LocalDateTime.now();
-//        this.createdBy =
+        this.updatedAt = LocalDateTime.now();
+//        this.createdBy = jwtUtils.getCurrentUserId();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateAt = LocalDateTime.now();
-        //
+        this.updatedAt = LocalDateTime.now();
+//        this.updateBy = jwtUtils.getCurrentUserId();
     }
 }

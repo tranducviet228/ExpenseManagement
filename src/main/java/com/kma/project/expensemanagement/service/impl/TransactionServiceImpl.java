@@ -12,6 +12,7 @@ import com.kma.project.expensemanagement.mapper.TransactionMapper;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
 import com.kma.project.expensemanagement.repository.TransactionRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
+import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.TransactionService;
 import com.kma.project.expensemanagement.service.UploadFileService;
 import com.kma.project.expensemanagement.utils.DataUtils;
@@ -22,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Transactional(readOnly = true)
@@ -44,6 +44,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     WalletRepository walletRepository;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
     @Transactional
     @Override
     public TransactionOutputDto add(TransactionInputDto inputDto) {
@@ -60,8 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.wallet-not-found")).build());
         entity.setWallet(wallet);
         entity.setWalletName(wallet.getName());
-        entity.setCreatedAt(LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());
+        entity.setCreatedBy(jwtUtils.getCurrentUserId());
         repository.save(entity);
         return mapper.convertToDto(entity);
     }

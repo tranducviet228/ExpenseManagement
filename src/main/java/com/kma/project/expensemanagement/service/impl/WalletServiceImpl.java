@@ -8,6 +8,7 @@ import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.WalletMapper;
 import com.kma.project.expensemanagement.repository.WalletRepository;
+import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.WalletService;
 import com.kma.project.expensemanagement.utils.DataUtils;
 import com.kma.project.expensemanagement.utils.PageUtils;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Service
@@ -30,12 +30,14 @@ public class WalletServiceImpl implements WalletService {
     @Autowired
     WalletMapper mapper;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
     @Transactional
     @Override
     public WalletOutputDto add(WalletInputDto inputDto) {
         WalletEntity walletEntity = mapper.convertToEntity(inputDto);
-        walletEntity.setUpdatedAt(LocalDateTime.now());
-        walletEntity.setCreatedAt(LocalDateTime.now());
+        walletEntity.setCreatedBy(jwtUtils.getCurrentUserId());
         repository.save(walletEntity);
         return mapper.convertToDto(walletEntity);
     }
