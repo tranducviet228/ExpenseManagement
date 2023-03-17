@@ -3,6 +3,7 @@ package com.kma.project.expensemanagement.service.impl;
 import com.kma.project.expensemanagement.dto.request.WalletInputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
+import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
 import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.exception.AppException;
@@ -18,7 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -70,7 +74,21 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public PageResponse<WalletOutputDto> getAllWallet(Integer page, Integer size, String sort) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
-        Page<WalletEntity> listWallet = repository.findAll(pageable);
+        Page<WalletEntity> listWallet = repository.findAllByCreatedBy(pageable, jwtUtils.getCurrentUserId());
         return PageUtils.formatPageResponse(listWallet.map(walletEntity -> mapper.convertToDto(walletEntity)));
+    }
+
+    @Override
+    public WalletInformationOutputDto getInfoAllWallet() {
+        Long moneyTotal = 0L;
+        List<WalletOutputDto> listWalletOutput = new ArrayList<>();
+        for (WalletEntity item : repository.findAllByCreatedBy(jwtUtils.getCurrentUserId())) {
+            listWalletOutput.add(mapper.convertToDto(item));
+            moneyTotal += item.getAccountBalance();
+        }
+        return WalletInformationOutputDto.builder()
+                .moneyTotal(BigDecimal.valueOf(moneyTotal))
+                .walletList(listWalletOutput)
+                .build();
     }
 }

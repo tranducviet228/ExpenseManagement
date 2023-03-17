@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/transaction")
 @Api(tags = "Quản lí giao dịch thu chi")
@@ -21,7 +23,7 @@ public class TransactionController {
 
     @ApiOperation(value = "Thêm mới giao dịch")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public TransactionOutputDto add(@ModelAttribute TransactionInputDto inputDto) {
+    public TransactionOutputDto add(@Valid @ModelAttribute TransactionInputDto inputDto) {
         return transactionService.add(inputDto);
     }
 

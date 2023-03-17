@@ -2,7 +2,7 @@ package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.request.WalletInputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
-import com.kma.project.expensemanagement.dto.response.PageResponse;
+import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
 import com.kma.project.expensemanagement.service.WalletService;
 import io.swagger.annotations.Api;
@@ -38,10 +38,16 @@ public class WalletController {
         walletService.delete(id);
     }
 
-    @ApiOperation(value = "Lấy danh sách ví")
+//    @ApiOperation(value = "Lấy danh sách ví")
+//    @GetMapping
+//    public PageResponse<WalletOutputDto> getAll(Integer page, Integer size, String sort) {
+//        return walletService.getAllWallet(page, size, sort);
+//    }
+
+    @ApiOperation(value = "Lấy thông tin tất cả các ví")
     @GetMapping
-    public PageResponse<WalletOutputDto> getAll(Integer page, Integer size, String sort) {
-        return walletService.getAllWallet(page, size, sort);
+    public WalletInformationOutputDto getAll() {
+        return walletService.getInfoAllWallet();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.authen.*;
+import com.kma.project.expensemanagement.exception.AppResponseDto;
 import com.kma.project.expensemanagement.service.MailService;
 import com.kma.project.expensemanagement.service.RefreshTokenService;
 import com.kma.project.expensemanagement.service.UserService;
@@ -50,34 +51,34 @@ public class AuthController {
 
     @ApiOperation(value = "Quên mật khẩu")
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+    public AppResponseDto forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         try {
             mailService.sendMail(request.getEmail());
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-        return ResponseEntity.ok("OTP sent successfully");
+        return AppResponseDto.builder().httpStatus(200).message("OTP sent successfully").build();
     }
 
     @ApiOperation(value = "Gửi otp và kiểm tra otp")
     @PostMapping("/send-otp")
-    public ResponseEntity<String> sendOtp(@Valid @RequestBody OtpRequestDto request) {
+    public AppResponseDto sendOtp(@Valid @RequestBody OtpRequestDto request) {
         userService.verifyOtp(request);
-        return ResponseEntity.ok("verify OTP successfully");
+        return AppResponseDto.builder().httpStatus(200).message("verify OTP successfully").build();
     }
 
     @ApiOperation(value = "Tạo mật khẩu mới")
     @PostMapping("/new-password")
-    public ResponseEntity<String> createNewPassword(@Valid @RequestBody NewPasswordRequestDto request) {
+    public AppResponseDto createNewPassword(@Valid @RequestBody NewPasswordRequestDto request) {
         userService.createNewPassword(request);
-        return ResponseEntity.ok("Change password successfully");
+        return AppResponseDto.builder().httpStatus(200).message("Create new password successfully").build();
     }
 
     @ApiOperation(value = "Thay đổi mật khẩu")
     @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) {
+    public AppResponseDto changePassword(@Valid @RequestBody ChangePasswordRequestDto request) {
         userService.changePassword(request);
-        return ResponseEntity.ok("Change password successfully");
+        return AppResponseDto.builder().httpStatus(200).message("Change password successfully").build();
     }
 
 }

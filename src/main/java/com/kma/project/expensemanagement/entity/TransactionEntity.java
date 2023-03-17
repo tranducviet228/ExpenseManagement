@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.entity;
 
+import com.kma.project.expensemanagement.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,11 +40,12 @@ public class TransactionEntity extends BaseEntity {
     @Column(name = "wallet_name")
     private String walletName;
 
-    @Column(name = "is_report")
-    private boolean isReport;
+    @Column(name = "add_to_report")
+    private boolean addToReport;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
-    private String transactionType;
+    private TransactionType transactionType;
 
     @Column(name = "image_url")
     private String imageUrl;

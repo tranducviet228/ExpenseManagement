@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,5 +26,9 @@ public class WalletOutputDto {
     private String description;
 
     private boolean isReport;
+
+    private LocalDateTime createdAt;
+
+    private Long createdBy;
 
 }

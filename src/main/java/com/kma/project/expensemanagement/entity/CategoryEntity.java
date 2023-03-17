@@ -1,12 +1,11 @@
 package com.kma.project.expensemanagement.entity;
 
+import com.kma.project.expensemanagement.enums.CategoryType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -29,4 +28,8 @@ public class CategoryEntity extends BaseEntity {
 
     @Column(name = "logo_image_id")
     private Long logoImageID;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category_type")
+    private CategoryType categoryType;
 }

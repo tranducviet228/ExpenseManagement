@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
 @RequestMapping("/api/v1/category")
 @Api(tags = "Quản lí danh mục thu chi")
@@ -44,8 +46,14 @@ public class CategoryController {
 
     @ApiOperation(value = "Lấy danh sách danh mục thu chi")
     @GetMapping
-    public PageResponse<CategoryOutputDto> getAll(Integer page, Integer size, String sort, String search, Long parentId) {
-        return categoryService.getAllCategory(page, size, sort, search, parentId);
+    public PageResponse<CategoryOutputDto> getAllByParentId(Integer page, Integer size, String sort, String search, Long parentId) {
+        return categoryService.getAllCategoryByParentId(page, size, sort, search, parentId);
     }
 
+
+    @ApiOperation(value = "Lấy tất cả danh mục thu chi")
+    @GetMapping("/all")
+    public Set<CategoryOutputDto> getAll(String search) {
+        return categoryService.getAllCategory(search);
+    }
 }

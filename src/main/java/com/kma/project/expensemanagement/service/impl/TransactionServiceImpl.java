@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Transactional(readOnly = true)
@@ -51,8 +52,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionOutputDto add(TransactionInputDto inputDto) {
         TransactionEntity entity = mapper.convertToEntity(inputDto);
-        String fileUrl = uploadFileService.uploadFileCloud(inputDto.getImageFile());
-        entity.setImageUrl(fileUrl);
+        if (inputDto.getImageFile() != null) {
+            String fileUrl = uploadFileService.uploadFileCloud(inputDto.getImageFile());
+            entity.setImageUrl(fileUrl);
+        }
 
         CategoryEntity category = categoryRepository.findById(inputDto.getCategoryId())
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.category-not-found")).build());
@@ -64,6 +67,7 @@ public class TransactionServiceImpl implements TransactionService {
         entity.setWallet(wallet);
         entity.setWalletName(wallet.getName());
         entity.setCreatedBy(jwtUtils.getCurrentUserId());
+        entity.setAriseDate(LocalDateTime.now());
         repository.save(entity);
         return mapper.convertToDto(entity);
     }
@@ -116,7 +120,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public PageResponse<TransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
-        Page<TransactionEntity> listTransaction = repository.findAll(pageable);
+        Page<TransactionEntity> listTransaction = repository.findAllByCreatedBy(pageable, jwtUtils.getCurrentUserId());
         return PageUtils.formatPageResponse(listTransaction.map(entity -> mapper.convertToDto(entity)));
     }
 }

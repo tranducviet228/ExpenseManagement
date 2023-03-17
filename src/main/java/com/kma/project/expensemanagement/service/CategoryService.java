@@ -5,6 +5,8 @@ import com.kma.project.expensemanagement.dto.response.CategoryOutputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 
+import java.util.Set;
+
 public interface CategoryService {
 
     CategoryOutputDto add(CategoryInputDto inputDto);
@@ -15,5 +17,8 @@ public interface CategoryService {
 
     DataResponse<CategoryOutputDto> getDetail(Long id);
 
-    PageResponse<CategoryOutputDto> getAllCategory(Integer page, Integer size, String sort, String search, Long parentId);
+    PageResponse<CategoryOutputDto> getAllCategoryByParentId(Integer page, Integer size, String sort, String search, Long parentId);
+
+    Set<CategoryOutputDto> getAllCategory(String search);
+
 }

@@ -29,10 +29,14 @@ public class TransactionOutputDto {
 
     private String walletName;
 
-    private boolean isReport;
+    private boolean addToReport;
 
     private String transactionType;
 
     private String imageUrl;
+
+    private LocalDateTime createdAt;
+
+    private Long createdBy;
 
 }

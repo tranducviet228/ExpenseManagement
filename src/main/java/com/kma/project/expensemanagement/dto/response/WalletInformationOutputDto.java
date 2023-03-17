@@ -4,23 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CategoryLogoOutputDto {
+public class WalletInformationOutputDto {
 
-    private Long id;
+    private BigDecimal moneyTotal;
 
-    private String fileUrl;
-
-    private String fileName;
-
-    private LocalDateTime createdAt;
-
-    private Long createdBy;
+    private List<WalletOutputDto> walletList;
 
 }

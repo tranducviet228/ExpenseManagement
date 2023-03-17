@@ -22,10 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,8 +50,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryOutputDto add(CategoryInputDto inputDto) {
         CategoryEntity categoryEntity = mapper.convertToEntity(inputDto);
-        logoRepository.findById(inputDto.getLogoImageID())
-                .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.logo-not-found")).build());
+        if (inputDto.getLogoImageID() != null) {
+            logoRepository.findById(inputDto.getLogoImageID())
+                    .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.logo-not-found")).build());
+        }
         categoryEntity.setCreatedBy(jwtUtils.getCurrentUserId());
         repository.save(categoryEntity);
         return mapper.convertToDto(categoryEntity);
@@ -94,8 +93,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public PageResponse<CategoryOutputDto> getAllCategory(Integer page, Integer size, String sort, String search, Long parentId) {
-
+    public PageResponse<CategoryOutputDto> getAllCategoryByParentId(Integer page, Integer size, String sort, String search, Long parentId) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         parentId = parentId == null ? 0 : parentId;
         Page<CategoryEntity> categoryPage = repository.findAllByNameLikeIgnoreCaseAndParentId(pageable, PageUtils.buildSearch(search), parentId);
@@ -113,4 +111,41 @@ public class CategoryServiceImpl implements CategoryService {
             return categoryOutputDto;
         }));
     }
+
+    @Override
+    public Set<CategoryOutputDto> getAllCategory(String search) {
+        List<CategoryOutputDto> categoryOutputs = repository.findAllByNameLikeIgnoreCaseAndCreatedBy(PageUtils.buildSearch(search)
+                        , jwtUtils.getCurrentUserId())
+                .stream().map(categoryEntity -> mapper.convertToDto(categoryEntity)).collect(Collectors.toList());
+
+        // tìm ra những thằng cha
+        List<CategoryOutputDto> cateList = new ArrayList<>(categoryOutputs);
+        cateList.forEach(item -> {
+            repository.findById(item.getParentId()).ifPresent(category -> categoryOutputs.add(mapper.convertToDto(category)));
+        });
+        Set<CategoryOutputDto> categoryParent = categoryOutputs.stream()
+                .filter(n -> n.getParentId().equals(0L))
+                .collect(Collectors.toSet());
+        // convert list to map, nhóm các thằng cùng cha lại với nhau
+        Map<Long, List<CategoryOutputDto>> map = new HashMap<>();
+        categoryOutputs.forEach(item -> {
+            if (!item.getParentId().equals(0L)) {
+                List<CategoryOutputDto> listMap;
+                if (map.get(item.getParentId()) == null) {
+                    listMap = new ArrayList<>();
+                } else {
+                    listMap = map.get(item.getParentId());
+                }
+                listMap.add(item);
+                map.put(item.getParentId(), listMap);
+            }
+        });
+        categoryParent.forEach(item -> {
+            if (map.get(item.getId()) != null) {
+                item.setChildCategory(map.get(item.getId()));
+            }
+        });
+        return categoryParent;
+    }
+
 }

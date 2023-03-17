@@ -21,4 +21,6 @@ public class CategoryInputDto {
 
     private Long logoImageID;
 
+    private String categoryType;
+
 }
