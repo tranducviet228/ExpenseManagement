@@ -84,6 +84,7 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             throw AppException.builder().errorCodes(Collections.singletonList("error.email-system-is-error")).build();
         }
+        body = body.replace(otp, "otp");
 
 
     }
