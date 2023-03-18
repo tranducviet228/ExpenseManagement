@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +28,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Value("${viet.app.jwtRefreshExpirationMs}")
     private Long refreshTokenDurationMs;
+
+    @Value("${viet.app.jwtExpirationMs}")
+    private int jwtExpirationMs;
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
@@ -72,7 +77,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     String token = "Bearer " + jwtUtils.generateTokenFromUsername(user.getUsername());
-                    return new TokenRefreshResponse(token, requestRefreshToken);
+                    Date expiredToken = new Date((new Date()).getTime() + jwtExpirationMs);
+                    LocalDateTime localDate = expiredToken.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    return new TokenRefreshResponse(token, requestRefreshToken, localDate.toString());
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                         "Refresh token is not in database!"));

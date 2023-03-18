@@ -45,8 +45,8 @@ public class AuthController {
 
     @ApiOperation(value = "Refresh token")
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
-        return ResponseEntity.ok(refreshTokenService.refreshToken(request));
+    public AppResponseDto<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+        return AppResponseDto.builder().httpStatus(200).data(refreshTokenService.refreshToken(request)).build();
     }
 
     @ApiOperation(value = "Quên mật khẩu")
