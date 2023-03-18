@@ -24,6 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,13 +94,16 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+        Date expiredDate = new Date((new Date()).getTime() + jwtExpirationMs);
+        LocalDateTime localDate = expiredDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
         JwtResponse jwtResponse = JwtResponse.builder()
                 .refreshToken(refreshToken.getToken())
                 .id(userDetails.getId())
                 .username(userDetails.getUsername())
                 .email(userDetails.getEmail())
                 .accessToken(jwt)
-                .expiredDate(new Date((new Date()).getTime() + jwtExpirationMs).toString())
+                .expiredDate(localDate.toString())
                 .build();
         return AppResponseDto.builder().data(jwtResponse).httpStatus(200).message("Đăng nhập thành công").build();
 
