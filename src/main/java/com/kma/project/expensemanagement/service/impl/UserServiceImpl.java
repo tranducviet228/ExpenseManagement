@@ -103,7 +103,8 @@ public class UserServiceImpl implements UserService {
                 .username(userDetails.getUsername())
                 .email(userDetails.getEmail())
                 .accessToken(jwt)
-                .expiredDate(localDate.toString())
+                .expiredAccessDate(localDate.toString())
+                .expiredRefreshDate(refreshToken.getExpiryDate().toString())
                 .build();
         return AppResponseDto.builder().data(jwtResponse).httpStatus(200).message("Đăng nhập thành công").build();
 
