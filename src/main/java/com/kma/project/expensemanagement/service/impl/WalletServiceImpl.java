@@ -80,14 +80,14 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public WalletInformationOutputDto getInfoAllWallet() {
-        Long moneyTotal = 0L;
+        BigDecimal moneyTotal = BigDecimal.ZERO;
         List<WalletOutputDto> listWalletOutput = new ArrayList<>();
         for (WalletEntity item : repository.findAllByCreatedBy(jwtUtils.getCurrentUserId())) {
             listWalletOutput.add(mapper.convertToDto(item));
-            moneyTotal += item.getAccountBalance();
+            moneyTotal = moneyTotal.add(item.getAccountBalance());
         }
         return WalletInformationOutputDto.builder()
-                .moneyTotal(BigDecimal.valueOf(moneyTotal))
+                .moneyTotal(moneyTotal)
                 .walletList(listWalletOutput)
                 .build();
     }

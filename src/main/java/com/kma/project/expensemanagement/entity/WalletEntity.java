@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Entity
 @Data
@@ -12,7 +13,7 @@ import javax.persistence.Table;
 public class WalletEntity extends BaseEntity {
 
     @Column(name = "account_balance")
-    private Long accountBalance;
+    private BigDecimal accountBalance;
 
     @Column(name = "name")
     private String name;

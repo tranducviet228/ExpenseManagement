@@ -14,5 +14,5 @@ import lombok.experimental.SuperBuilder;
 public class AppExceptionError {
     private String errorCode;
     private String errorMessage;
-    private String[] stackFrames;
+//    private String[] stackFrames;
 }

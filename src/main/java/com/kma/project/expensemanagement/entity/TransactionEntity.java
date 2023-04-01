@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 public class TransactionEntity extends BaseEntity {
 
     @Column(name = "amount")
-    private Long amount;
+    private BigDecimal amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

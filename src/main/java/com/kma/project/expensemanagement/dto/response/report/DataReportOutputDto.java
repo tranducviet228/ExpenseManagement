@@ -1,28 +1,26 @@
-package com.kma.project.expensemanagement.dto.request;
+package com.kma.project.expensemanagement.dto.response.report;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WalletInputDto {
-
-    private BigDecimal accountBalance;
+public class DataReportOutputDto {
 
     private String name;
 
-    private String accountType;
+    private BigDecimal incomeTotal;
 
-    private String currency;
+    private BigDecimal expenseTotal;
 
-    private String description;
-
-    private boolean isReport;
+    private BigDecimal remainTotal;
 
 }

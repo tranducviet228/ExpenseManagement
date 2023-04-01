@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,7 +16,7 @@ public class WalletOutputDto {
 
     private Long id;
 
-    private Long accountBalance;
+    private BigDecimal accountBalance;
 
     private String name;
 

@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
-@Api(tags = "Quản lí tài khoản, đăng nhập, đăng kí")
+@Api(tags = "Quản lí tài khoản")
 public class AuthController {
 
     @Autowired
