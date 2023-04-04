@@ -4,6 +4,7 @@ import com.kma.project.expensemanagement.dto.response.TransactionOutputDto;
 import com.kma.project.expensemanagement.dto.response.report.*;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
+import com.kma.project.expensemanagement.enums.TransactionType;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.TransactionMapper;
 import com.kma.project.expensemanagement.repository.TransactionRepository;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -208,6 +210,113 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
         }
         return null;
+    }
+
+    @Override
+    public DetailReportOutputDto getDetailReport(String type, String time, String toTime, String timeType, Long walletId) {
+        type = type == null ? EnumUtils.EXPENSE : type;
+        List<LocalDate> localDates = getPeriodTime(time, toTime, timeType);
+        LocalDateTime firstDate = localDates.get(0).atTime(0, 0, 0);
+        LocalDateTime lastDate = localDates.get(1).atTime(23, 59, 59);
+
+        BigDecimal totalAmount = transactionRepository
+                .sumTotalByWalletIdAndTranType(firstDate, lastDate, walletId, Enum.valueOf(TransactionType.class, type));
+
+        List<CategoryDetailReportOutputDto> categoryReports = new ArrayList<>();
+        List<TransactionRepository.CategoryDetailReport> categoryDetailReports = transactionRepository
+                .getCategoryDetail(Enum.valueOf(TransactionType.class, type), walletId, firstDate, lastDate);
+        categoryDetailReports.forEach(item -> {
+            CategoryDetailReportOutputDto outputDto = new CategoryDetailReportOutputDto();
+            outputDto.setTotalAmount(item.getTotalAmount());
+            outputDto.setCategoryImage(item.getCategoryImage());
+            outputDto.setCategoryName(item.getCategoryName());
+            outputDto.setPercent(item.getTotalAmount().divide(totalAmount, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")));
+            categoryReports.add(outputDto);
+        });
+        return DetailReportOutputDto.builder().categoryReports(categoryReports).totalAmount(totalAmount).build();
+    }
+
+    @Override
+    public ReportStatisticOutputDto expenseAnalysis(String type, String timeType, String fromTime, String toTime,
+                                                    List<Long> categoryIds, List<Long> walletIds) {
+        LocalDateTime fromDate;
+        LocalDateTime toDate;
+        List<TransactionRepository.AnalysisDetail> analysisDetail;
+        if (EnumUtils.DAY.equals(timeType)) {
+            fromDate = LocalDate.parse(fromTime).atTime(0, 0, 0);
+            toDate = LocalDate.parse(toTime).atTime(23, 59, 59);
+            analysisDetail = transactionRepository
+                    .getDayAnalysisDetail(fromDate, toDate, type, walletIds);
+
+        } else if (EnumUtils.MONTH.equals(timeType)) {
+            // 2023-01
+            String[] fromDates = fromTime.split("-");
+            String[] toDates = fromTime.split("-");
+            fromDate = LocalDate.of(Integer.parseInt(fromDates[0]), Integer.parseInt(fromDates[1]), 1).atTime(0, 0, 0);
+            toDate = LocalDate.of(Integer.parseInt(toDates[0]), Integer.parseInt(toDates[1]), 1).atTime(23, 59, 59);
+            toDate = toDate.withDayOfMonth(toDate.toLocalDate().lengthOfMonth());
+
+            analysisDetail = transactionRepository
+                    .getMonthAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds);
+        } else {
+            // YEAR 2018-2023
+            fromDate = LocalDate.of(Integer.parseInt(fromTime), 1, 1).atTime(0, 0, 0);
+            toDate = LocalDate.of(Integer.parseInt(toTime), 12, 1).atTime(23, 59, 59);
+            toDate = toDate.withDayOfMonth(toDate.toLocalDate().lengthOfMonth());
+
+            analysisDetail = transactionRepository
+                    .getYearAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds);
+        }
+        analysisDetail.forEach(item -> {
+//            System.out.println(item.getAmount());
+//            System.out.println(item.getCreatedAt());
+        });
+
+
+        return null;
+    }
+
+
+    public List<LocalDate> getPeriodTime(String time, String toTime, String timeType) {
+        List<LocalDate> dateList = new ArrayList<>();
+        switch (timeType) {
+            case EnumUtils.DAY:
+                // 2023-04-02
+                dateList.add(LocalDate.parse(time));
+                break;
+            case EnumUtils.WEEK:
+                getWeekReport();
+                break;
+            case EnumUtils.MONTH:
+                // 2023-01-01
+                LocalDate fromDate = LocalDate.parse(time);
+                LocalDate toDate = fromDate.withDayOfMonth(fromDate.lengthOfMonth());
+                dateList.add(fromDate);
+                dateList.add(toDate);
+                break;
+            case EnumUtils.QUARTER:
+                // 1-2023
+                String[] quarters = time.split("-");
+                LocalDate startQuarter = LocalDate.ofYearDay(Integer.parseInt(quarters[1]), 1)
+                        .with(IsoFields.QUARTER_OF_YEAR, Integer.parseInt(quarters[0]));
+                LocalDate endQuarter = startQuarter.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
+                dateList.add(startQuarter);
+                dateList.add(endQuarter);
+                break;
+            case EnumUtils.YEAR:
+                // 2023
+                LocalDate fistDateInYear = LocalDate.ofYearDay(Integer.parseInt(time), 1);
+                LocalDate lastDateInYear = fistDateInYear.with(TemporalAdjusters.lastDayOfYear());
+                dateList.add(fistDateInYear);
+                dateList.add(lastDateInYear);
+                break;
+            case EnumUtils.CUSTOM:
+                // time: 2023/01/01, fromTime: 2023/04/01
+                dateList.add(LocalDate.parse(time));
+                dateList.add(LocalDate.parse(toTime));
+                break;
+        }
+        return dateList;
     }
 
     public ExpenseIncomeSituationOutputDto getMonthReport(Long walletId, Integer year) {
