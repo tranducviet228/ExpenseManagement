@@ -6,6 +6,7 @@ import lombok.Setter;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,4 +23,6 @@ public class SignUpRequest {
     @NotBlank(message = "{error.password-not-null}")
     @Size(min = 6, max = 40, message = "{error.password-not-valid}")
     private String password;
+
+    private List<String> roles;
 }

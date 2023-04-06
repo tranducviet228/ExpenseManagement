@@ -4,11 +4,14 @@ import com.kma.project.expensemanagement.dto.response.TransactionOutputDto;
 import com.kma.project.expensemanagement.dto.response.report.*;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
+import com.kma.project.expensemanagement.enums.CategoryType;
 import com.kma.project.expensemanagement.enums.TransactionType;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.TransactionMapper;
+import com.kma.project.expensemanagement.repository.CategoryRepository;
 import com.kma.project.expensemanagement.repository.TransactionRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
+import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.FinancialReportService;
 import com.kma.project.expensemanagement.service.WalletService;
 import com.kma.project.expensemanagement.utils.EnumUtils;
@@ -40,6 +43,12 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     @Autowired
     WalletService walletService;
 
+    @Autowired
+    CategoryRepository categoryRepository;
+
+    @Autowired
+    JwtUtils jwtUtils;
+
     public static List<LocalDate> getWeekReport() {
         LocalDate date = LocalDate.now();
         String dayOfWeek = String.valueOf(date.getDayOfWeek());
@@ -58,7 +67,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     @Override
     public FinancialStatementOutputDto financialStatement(Long walletId, String localDate) {
 
-        BigDecimal accountBalance = null;
+        BigDecimal accountBalance;
         if (walletId != null) {
             WalletEntity walletEntity = walletRepository.findById(walletId)
                     .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.wallet-not-found")).build());
@@ -129,22 +138,24 @@ public class FinancialReportServiceImpl implements FinancialReportService {
         // get current balance
         if (walletId != null) {
             // get all transaction in month
-            transactionOutputs = transactionRepository.findAllTransactionByWalletId(firstDate, lastDate, walletId)
+            transactionOutputs = transactionRepository
+                    .findAllTransactionByWalletId(firstDate, lastDate, List.of(walletId), jwtUtils.getCurrentUserId())
                     .stream().map(entity -> transactionMapper.convertToDto(entity)).collect(Collectors.toList());
         } else {
             // get all transaction in all wallet
-            transactionOutputs = transactionRepository.findAllInMonth(firstDate, lastDate)
+            transactionOutputs = transactionRepository.findAllInMonth(firstDate, lastDate, jwtUtils.getCurrentUserId())
                     .stream().map(entity -> transactionMapper.convertToDto(entity)).collect(Collectors.toList());
         }
         return transactionOutputs;
     }
 
-    public ExpenseIncomeSituationOutputDto getCurrentReport(Long walletId) {
+    public ExpenseIncomeSituationOutputDto getCurrentReport(List<Long> walletIds) {
         LocalDate currentDate = LocalDate.now();
         List<DataReportOutputDto> dataReports = new ArrayList<>();
+        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
 
         // ngày hiện tại
-        ExpenseAndIncomeTotalOutputDto dayTotal = getTotalInPeriodTime(currentDate, currentDate, walletId);
+        ExpenseAndIncomeTotalOutputDto dayTotal = getTotalInPeriodTime(currentDate, currentDate, walletIds);
         dataReports.add(DataReportOutputDto.builder().expenseTotal(dayTotal.getExpenseTotal())
                 .incomeTotal(dayTotal.getIncomeTotal())
                 .remainTotal(dayTotal.getIncomeTotal().subtract(dayTotal.getExpenseTotal()))
@@ -152,7 +163,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
         // tuần hiện tại
         List<LocalDate> dateInWeek = getWeekReport();
-        ExpenseAndIncomeTotalOutputDto weekTotal = getTotalInPeriodTime(dateInWeek.get(0), dateInWeek.get(dateInWeek.size() - 1), walletId);
+        ExpenseAndIncomeTotalOutputDto weekTotal = getTotalInPeriodTime(dateInWeek.get(0), dateInWeek.get(dateInWeek.size() - 1), walletIds);
         dataReports.add(DataReportOutputDto.builder().expenseTotal(weekTotal.getExpenseTotal())
                 .incomeTotal(weekTotal.getIncomeTotal())
                 .remainTotal(weekTotal.getIncomeTotal().subtract(weekTotal.getExpenseTotal()))
@@ -160,7 +171,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
         // tháng hiện tại
         ExpenseAndIncomeTotalOutputDto monthTotal = getTotalInPeriodTime(currentDate.withDayOfMonth(1),
-                currentDate.withDayOfMonth(currentDate.lengthOfMonth()), walletId);
+                currentDate.withDayOfMonth(currentDate.lengthOfMonth()), walletIds);
         dataReports.add(DataReportOutputDto.builder().expenseTotal(monthTotal.getExpenseTotal())
                 .incomeTotal(monthTotal.getIncomeTotal())
                 .remainTotal(monthTotal.getIncomeTotal().subtract(monthTotal.getExpenseTotal()))
@@ -170,7 +181,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
         LocalDate startOfQuarter = currentDate.with(currentDate.getMonth().firstMonthOfQuarter())
                 .withDayOfMonth(1);
         LocalDate endOfQuarter = startOfQuarter.plusMonths(3).minusDays(1);
-        ExpenseAndIncomeTotalOutputDto quarterTotal = getTotalInPeriodTime(startOfQuarter, endOfQuarter, walletId);
+        ExpenseAndIncomeTotalOutputDto quarterTotal = getTotalInPeriodTime(startOfQuarter, endOfQuarter, walletIds);
         dataReports.add(DataReportOutputDto.builder().expenseTotal(quarterTotal.getExpenseTotal())
                 .incomeTotal(quarterTotal.getIncomeTotal())
                 .remainTotal(quarterTotal.getIncomeTotal().subtract(quarterTotal.getExpenseTotal()))
@@ -178,7 +189,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
         // năm hiện tại
         ExpenseAndIncomeTotalOutputDto yearTotal = getTotalInPeriodTime(currentDate.withDayOfYear(1),
-                currentDate.withDayOfYear(currentDate.lengthOfYear()), walletId);
+                currentDate.withDayOfYear(currentDate.lengthOfYear()), walletIds);
         dataReports.add(DataReportOutputDto.builder().expenseTotal(yearTotal.getExpenseTotal())
                 .incomeTotal(yearTotal.getIncomeTotal())
                 .remainTotal(yearTotal.getIncomeTotal().subtract(yearTotal.getExpenseTotal()))
@@ -191,40 +202,44 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
     @Override
     public ExpenseIncomeSituationOutputDto expenseIncomeSituation(String type, Integer year, Integer toYear,
-                                                                  Long walletId, String fromTime, String toTime) {
+                                                                  List<Long> walletIds, String fromTime, String toTime) {
+
+        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
         switch (type) {
             case EnumUtils.CURRENT:
-                return getCurrentReport(walletId);
+                return getCurrentReport(walletIds);
 
             case EnumUtils.MONTH:
-                return getMonthReport(walletId, year);
+                return getMonthReport(walletIds, year);
 
             case EnumUtils.QUARTER:
-                return getQuarterReport(walletId, year);
+                return getQuarterReport(walletIds, year);
 
             case EnumUtils.YEAR:
-                return getYearReport(walletId, year, toYear);
+                return getYearReport(walletIds, year, toYear);
 
             case EnumUtils.CUSTOM:
-                return getCustomReport(walletId, LocalDate.parse(fromTime), LocalDate.parse(toTime));
+                return getCustomReport(walletIds, LocalDate.parse(fromTime), LocalDate.parse(toTime));
 
         }
         return null;
     }
 
     @Override
-    public DetailReportOutputDto getDetailReport(String type, String time, String toTime, String timeType, Long walletId) {
+    public DetailReportOutputDto getDetailReport(String type, String time, String toTime, String timeType, List<Long> walletIds) {
         type = type == null ? EnumUtils.EXPENSE : type;
+        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
+
         List<LocalDate> localDates = getPeriodTime(time, toTime, timeType);
         LocalDateTime firstDate = localDates.get(0).atTime(0, 0, 0);
         LocalDateTime lastDate = localDates.get(1).atTime(23, 59, 59);
 
         BigDecimal totalAmount = transactionRepository
-                .sumTotalByWalletIdAndTranType(firstDate, lastDate, walletId, Enum.valueOf(TransactionType.class, type));
+                .sumTotalByWalletIdAndTranType(firstDate, lastDate, walletIds, Enum.valueOf(TransactionType.class, type), jwtUtils.getCurrentUserId());
 
         List<CategoryDetailReportOutputDto> categoryReports = new ArrayList<>();
         List<TransactionRepository.CategoryDetailReport> categoryDetailReports = transactionRepository
-                .getCategoryDetail(Enum.valueOf(TransactionType.class, type), walletId, firstDate, lastDate);
+                .getCategoryDetail(Enum.valueOf(TransactionType.class, type), walletIds, firstDate, lastDate, jwtUtils.getCurrentUserId());
         categoryDetailReports.forEach(item -> {
             CategoryDetailReportOutputDto outputDto = new CategoryDetailReportOutputDto();
             outputDto.setTotalAmount(item.getTotalAmount());
@@ -237,43 +252,76 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     }
 
     @Override
-    public ReportStatisticOutputDto expenseAnalysis(String type, String timeType, String fromTime, String toTime,
-                                                    List<Long> categoryIds, List<Long> walletIds) {
+    public ReportStatisticOutputDto expenseIncomeAnalysis(String type, String timeType, String fromTime, String toTime,
+                                                          List<Long> categoryIds, List<Long> walletIds) {
         LocalDateTime fromDate;
         LocalDateTime toDate;
-        List<TransactionRepository.AnalysisDetail> analysisDetail;
+        categoryIds = categoryIds.isEmpty() ? categoryRepository
+                .getAllCategoryId(Enum.valueOf(CategoryType.class, type), jwtUtils.getCurrentUserId()) : categoryIds;
+        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        BigDecimal mediumAmount = BigDecimal.ZERO;
+        List<DetailReportStatisticOutputDto> categoryReports = new ArrayList<>();
+
         if (EnumUtils.DAY.equals(timeType)) {
             fromDate = LocalDate.parse(fromTime).atTime(0, 0, 0);
             toDate = LocalDate.parse(toTime).atTime(23, 59, 59);
-            analysisDetail = transactionRepository
-                    .getDayAnalysisDetail(fromDate, toDate, type, walletIds);
+            List<TransactionRepository.AnalysisDetail> analysisDetail = transactionRepository
+                    .getDayAnalysisDetail(fromDate, toDate, type, walletIds, categoryIds, jwtUtils.getCurrentUserId());
+            for (TransactionRepository.AnalysisDetail item : analysisDetail) {
+                DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
+                detailReportStatistic.setTime(item.getCreatedAt().toString());
+                detailReportStatistic.setTotalAmount(item.getAmount());
+                categoryReports.add(detailReportStatistic);
+                totalAmount = totalAmount.add(item.getAmount());
+            }
+            if (!categoryReports.isEmpty()) {
+                mediumAmount = totalAmount.divide(BigDecimal.valueOf(categoryReports.size()), 0, RoundingMode.HALF_UP);
+            }
 
         } else if (EnumUtils.MONTH.equals(timeType)) {
             // 2023-01
             String[] fromDates = fromTime.split("-");
-            String[] toDates = fromTime.split("-");
+            String[] toDates = toTime.split("-");
             fromDate = LocalDate.of(Integer.parseInt(fromDates[0]), Integer.parseInt(fromDates[1]), 1).atTime(0, 0, 0);
             toDate = LocalDate.of(Integer.parseInt(toDates[0]), Integer.parseInt(toDates[1]), 1).atTime(23, 59, 59);
             toDate = toDate.withDayOfMonth(toDate.toLocalDate().lengthOfMonth());
 
-            analysisDetail = transactionRepository
-                    .getMonthAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds);
+            List<TransactionRepository.AnalysisMonthDetail> monthDetail = transactionRepository
+                    .getMonthAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds, jwtUtils.getCurrentUserId());
+
+            for (TransactionRepository.AnalysisMonthDetail item : monthDetail) {
+                DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
+                detailReportStatistic.setTime(item.getMonth() + "-" + item.getYear());
+                detailReportStatistic.setTotalAmount(item.getAmount());
+                categoryReports.add(detailReportStatistic);
+                totalAmount = totalAmount.add(item.getAmount());
+            }
+            if (!categoryReports.isEmpty()) {
+                mediumAmount = totalAmount.divide(BigDecimal.valueOf(categoryReports.size()), 0, RoundingMode.HALF_UP);
+            }
         } else {
             // YEAR 2018-2023
             fromDate = LocalDate.of(Integer.parseInt(fromTime), 1, 1).atTime(0, 0, 0);
             toDate = LocalDate.of(Integer.parseInt(toTime), 12, 1).atTime(23, 59, 59);
             toDate = toDate.withDayOfMonth(toDate.toLocalDate().lengthOfMonth());
 
-            analysisDetail = transactionRepository
-                    .getYearAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds);
+            List<TransactionRepository.AnalysisMonthDetail> yearDetail = transactionRepository
+                    .getYearAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds, jwtUtils.getCurrentUserId());
+            for (TransactionRepository.AnalysisMonthDetail item : yearDetail) {
+                DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
+                detailReportStatistic.setTime(item.getYear().toString());
+                detailReportStatistic.setTotalAmount(item.getAmount());
+                categoryReports.add(detailReportStatistic);
+                totalAmount = totalAmount.add(item.getAmount());
+            }
+            if (!categoryReports.isEmpty()) {
+                mediumAmount = totalAmount.divide(BigDecimal.valueOf(categoryReports.size()), 0, RoundingMode.HALF_UP);
+            }
         }
-        analysisDetail.forEach(item -> {
-//            System.out.println(item.getAmount());
-//            System.out.println(item.getCreatedAt());
-        });
 
-
-        return null;
+        return ReportStatisticOutputDto.builder().totalAmount(totalAmount).mediumAmount(mediumAmount)
+                .categoryReports(categoryReports).build();
     }
 
 
@@ -283,9 +331,10 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             case EnumUtils.DAY:
                 // 2023-04-02
                 dateList.add(LocalDate.parse(time));
+                dateList.add(LocalDate.parse(time));
                 break;
             case EnumUtils.WEEK:
-                getWeekReport();
+                dateList = getWeekReport();
                 break;
             case EnumUtils.MONTH:
                 // 2023-01-01
@@ -311,7 +360,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
                 dateList.add(lastDateInYear);
                 break;
             case EnumUtils.CUSTOM:
-                // time: 2023/01/01, fromTime: 2023/04/01
+                // time: 2023-01-01, fromTime: 2023-04-01
                 dateList.add(LocalDate.parse(time));
                 dateList.add(LocalDate.parse(toTime));
                 break;
@@ -319,10 +368,10 @@ public class FinancialReportServiceImpl implements FinancialReportService {
         return dateList;
     }
 
-    public ExpenseIncomeSituationOutputDto getMonthReport(Long walletId, Integer year) {
+    public ExpenseIncomeSituationOutputDto getMonthReport(List<Long> walletIds, Integer year) {
 
         List<DataReportOutputDto> dataReports = new ArrayList<>();
-        List<TransactionRepository.ReportData> data = transactionRepository.sumAmountByMonth(year);
+        List<TransactionRepository.ReportData> data = transactionRepository.sumAmountByMonth(year, walletIds, jwtUtils.getCurrentUserId());
         data.forEach(item -> {
             dataReports.add(DataReportOutputDto.builder()
                     .expenseTotal(item.getExpenseTotal())
@@ -336,7 +385,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
                 .build();
     }
 
-    public ExpenseIncomeSituationOutputDto getQuarterReport(Long walletId, Integer year) {
+    public ExpenseIncomeSituationOutputDto getQuarterReport(List<Long> walletIds, Integer year) {
         List<DataReportOutputDto> dataReports = new ArrayList<>();
 
         for (int i = 1; i <= 4; i++) {
@@ -344,7 +393,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             LocalDate startQuarter = LocalDate.ofYearDay(year, 1).with(IsoFields.QUARTER_OF_YEAR, i);
             LocalDate endQuarter = startQuarter.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
 
-            ExpenseAndIncomeTotalOutputDto expenseAndIncomeTotal = getTotalInPeriodTime(startQuarter, endQuarter, walletId);
+            ExpenseAndIncomeTotalOutputDto expenseAndIncomeTotal = getTotalInPeriodTime(startQuarter, endQuarter, walletIds);
 
             dataReports.add(DataReportOutputDto.builder()
                     .expenseTotal(expenseAndIncomeTotal.getExpenseTotal())
@@ -358,11 +407,11 @@ public class FinancialReportServiceImpl implements FinancialReportService {
                 .build();
     }
 
-    public ExpenseIncomeSituationOutputDto getYearReport(Long walletId, Integer year, Integer toYear) {
+    public ExpenseIncomeSituationOutputDto getYearReport(List<Long> walletIds, Integer year, Integer toYear) {
         List<DataReportOutputDto> dataReports = new ArrayList<>();
 
         for (int i = 0; i <= (toYear - year); i++) {
-            ExpenseIncomeInYearOutputDto expenseAndIncomeTotal = getTotalInYear(walletId, year + i);
+            ExpenseIncomeInYearOutputDto expenseAndIncomeTotal = getTotalInYear(walletIds, year + i);
             dataReports.add(DataReportOutputDto.builder()
                     .expenseTotal(expenseAndIncomeTotal.getExpenseTotal())
                     .incomeTotal(expenseAndIncomeTotal.getIncomeTotal())
@@ -375,10 +424,10 @@ public class FinancialReportServiceImpl implements FinancialReportService {
                 .build();
     }
 
-    public ExpenseIncomeSituationOutputDto getCustomReport(Long walletId, LocalDate fromTime, LocalDate toTime) {
+    public ExpenseIncomeSituationOutputDto getCustomReport(List<Long> walletIds, LocalDate fromTime, LocalDate toTime) {
         List<DataReportOutputDto> dataReports = new ArrayList<>();
 
-        ExpenseAndIncomeTotalOutputDto expenseAndIncomeTotal = getTotalInPeriodTime(fromTime, toTime, walletId);
+        ExpenseAndIncomeTotalOutputDto expenseAndIncomeTotal = getTotalInPeriodTime(fromTime, toTime, walletIds);
 
         dataReports.add(DataReportOutputDto.builder()
                 .expenseTotal(expenseAndIncomeTotal.getExpenseTotal())
@@ -392,22 +441,22 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     }
 
     // lấy tổng số tiền trong 1 năm
-    public ExpenseIncomeInYearOutputDto getTotalInYear(Long walletId, Integer year) {
+    public ExpenseIncomeInYearOutputDto getTotalInYear(List<Long> walletIds, Integer year) {
         LocalDate fistDateInYear = LocalDate.ofYearDay(year, 1);
         LocalDate lastDateInYear = fistDateInYear.with(TemporalAdjusters.lastDayOfYear());
-        ExpenseAndIncomeTotalOutputDto outputDto = getTotalInPeriodTime(fistDateInYear, lastDateInYear, walletId);
+        ExpenseAndIncomeTotalOutputDto outputDto = getTotalInPeriodTime(fistDateInYear, lastDateInYear, walletIds);
         return ExpenseIncomeInYearOutputDto.builder()
                 .expenseTotal(outputDto.getExpenseTotal())
                 .incomeTotal(outputDto.getIncomeTotal()).build();
     }
 
     // lấy tổng số tiền trong 1 khoảng thời gian
-    public ExpenseAndIncomeTotalOutputDto getTotalInPeriodTime(LocalDate fromDate, LocalDate toDate, Long walletId) {
+    public ExpenseAndIncomeTotalOutputDto getTotalInPeriodTime(LocalDate fromDate, LocalDate toDate, List<Long> walletIds) {
         LocalDateTime firstDate = fromDate.atTime(0, 0, 0);
         LocalDateTime lastDate = toDate.atTime(23, 59, 59);
         BigDecimal expenseTotal = BigDecimal.ZERO;
         BigDecimal incomeTotal = BigDecimal.ZERO;
-        List<TransactionEntity> trans = transactionRepository.findAllTransactionByWalletId(firstDate, lastDate, walletId);
+        List<TransactionEntity> trans = transactionRepository.findAllTransactionByWalletId(firstDate, lastDate, walletIds, jwtUtils.getCurrentUserId());
         for (TransactionEntity item : trans) {
             if (EnumUtils.EXPENSE.equals(item.getTransactionType().name())) {
                 expenseTotal = expenseTotal.add(item.getAmount());

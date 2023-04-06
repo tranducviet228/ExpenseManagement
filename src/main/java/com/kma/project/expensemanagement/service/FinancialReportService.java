@@ -17,18 +17,12 @@ public interface FinancialReportService {
 
     // tình hình thu chi
     ExpenseIncomeSituationOutputDto expenseIncomeSituation(String type, Integer year, Integer toYear,
-                                                           Long walletId, String fromTime, String toTime);
+                                                           List<Long> walletIds, String fromTime, String toTime);
 
-    DetailReportOutputDto getDetailReport(String type, String time, String toTime, String timeType, Long walletId);
+    DetailReportOutputDto getDetailReport(String type, String time, String toTime, String timeType, List<Long> walletIds);
 
-    // phân tích chi tiêu
-    ReportStatisticOutputDto expenseAnalysis(String type, String timeType, String fromTime, String toTime,
-                                             List<Long> categoryIds, List<Long> walletIds);
-//
-//    // phân tích thu
-//    void incomeAnalysis();
-//
-//    // chuyến đi, sự kiện
-//    void eventReport();
+    // phân tích chi tiêu, thu
+    ReportStatisticOutputDto expenseIncomeAnalysis(String type, String timeType, String fromTime, String toTime,
+                                                   List<Long> categoryIds, List<Long> walletIds);
 
 }

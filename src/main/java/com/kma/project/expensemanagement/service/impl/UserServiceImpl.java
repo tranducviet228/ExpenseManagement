@@ -1,20 +1,27 @@
 package com.kma.project.expensemanagement.service.impl;
 
 import com.kma.project.expensemanagement.dto.authen.*;
+import com.kma.project.expensemanagement.dto.request.UserInputDto;
+import com.kma.project.expensemanagement.dto.response.PageResponse;
+import com.kma.project.expensemanagement.dto.response.UserOutputDto;
 import com.kma.project.expensemanagement.entity.RefreshToken;
 import com.kma.project.expensemanagement.entity.RoleEntity;
 import com.kma.project.expensemanagement.entity.UserEntity;
 import com.kma.project.expensemanagement.enums.ERole;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.exception.AppResponseDto;
+import com.kma.project.expensemanagement.mapper.UserMapper;
 import com.kma.project.expensemanagement.repository.RoleRepository;
 import com.kma.project.expensemanagement.repository.UserRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.security.services.UserDetailsImpl;
 import com.kma.project.expensemanagement.service.RefreshTokenService;
 import com.kma.project.expensemanagement.service.UserService;
+import com.kma.project.expensemanagement.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,6 +53,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Value("${viet.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
@@ -65,9 +75,18 @@ public class UserServiceImpl implements UserService {
                 passwordEncoder.encode(signUpRequest.getPassword()));
 
         Set<RoleEntity> roles = new HashSet<>();
-        RoleEntity userRole = roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.role-not-exist")).build());
-        roles.add(userRole);
+        RoleEntity userRole;
+        if (!signUpRequest.getRoles().isEmpty()) {
+            for (String item : signUpRequest.getRoles()) {
+                userRole = roleRepository.findByName(ERole.valueOf(item))
+                        .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.role-not-exist")).build());
+                roles.add(userRole);
+            }
+        } else {
+            userRole = roleRepository.findByName(ERole.ROLE_USER)
+                    .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.role-not-exist")).build());
+            roles.add(userRole);
+        }
         user.setRoles(roles);
         userRepository.save(user);
         return AppResponseDto.builder().httpStatus(200).message("Đăng kí thành công").build();
@@ -148,5 +167,68 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.username-not-found")).build());
         userEntity.setPassword(passwordEncoder.encode(changePasswordRequestDto.getPassword()));
         userRepository.save(userEntity);
+    }
+
+    @Override
+    public PageResponse<UserOutputDto> getAllUser(Integer page, Integer size, String sort, String search) {
+        Pageable pageable = PageUtils.customPageable(page, size, sort);
+        search = PageUtils.buildSearch(search);
+        Page<UserEntity> pageUser = userRepository.findAllByEmailLikeIgnoreCaseOrUsernameLikeIgnoreCase(pageable, search, search);
+        return PageUtils.formatPageResponse(pageUser.map(userEntity -> {
+            return userMapper.convertToDto(userEntity);
+        }));
+    }
+
+    @Transactional
+    @Override
+    public UserOutputDto updateUser(Long userId, UserInputDto dto) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.entity-not-found")).build());
+        if (!userEntity.getUsername().equals(dto.getUsername()) && dto.getUsername() != null) {
+            if (userRepository.existsByUsername(dto.getUsername())) {
+                throw AppException.builder().errorCodes(Collections.singletonList("error.username-exist")).build();
+            }
+            userEntity.setUsername(dto.getUsername());
+        }
+
+        if (!userEntity.getEmail().equals(dto.getEmail()) && dto.getEmail() != null) {
+            if (userRepository.existsByEmail(dto.getEmail())) {
+                throw AppException.builder().errorCodes(Collections.singletonList("error.email-exist")).build();
+            }
+            userEntity.setEmail(dto.getEmail());
+        }
+        if (dto.getPassword() != null && dto.getConfirmPassword() != null) {
+            if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+                throw AppException.builder().errorCodes(Collections.singletonList("error.password-not-correct")).build();
+            }
+            userEntity.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        Set<RoleEntity> roles = new HashSet<>();
+        if (!dto.getRoles().isEmpty()) {
+            for (String item : dto.getRoles()) {
+                RoleEntity userRole = roleRepository.findByName(ERole.valueOf(item))
+                        .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.role-not-exist")).build());
+                roles.add(userRole);
+            }
+        }
+        userEntity.setRoles(roles);
+        userRepository.save(userEntity);
+        return userMapper.convertToDto(userEntity);
+    }
+
+    @Transactional
+    @Override
+    public void delete(Long userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.entity-not-found")).build());
+        userRepository.delete(userEntity);
+    }
+
+    @Override
+    public UserOutputDto getDetailUser(Long userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.entity-not-found")).build());
+        return userMapper.convertToDto(userEntity);
     }
 }

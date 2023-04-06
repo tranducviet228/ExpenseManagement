@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.controller;
 
+import com.kma.project.expensemanagement.dto.request.ReportSituationInputDto;
 import com.kma.project.expensemanagement.dto.request.ReportStatisticInputDto;
 import com.kma.project.expensemanagement.dto.response.report.DetailReportOutputDto;
 import com.kma.project.expensemanagement.dto.response.report.ExpenseIncomeSituationOutputDto;
@@ -33,23 +34,25 @@ public class FinancialReportController {
 //    }
 
     @ApiOperation("Tình hình thu chi")
-    @GetMapping("/report")
-    public ExpenseIncomeSituationOutputDto expenseIncomeSituation(String type, Integer year, Integer toYear,
-                                                                  Long walletId, String fromTime, String toTime) {
-        return financialReportService.expenseIncomeSituation(type, year, toYear, walletId, fromTime, toTime);
+    @PutMapping("/report")
+    public ExpenseIncomeSituationOutputDto expenseIncomeSituation(@RequestBody ReportSituationInputDto inputDto,
+                                                                  String type, Integer year, Integer toYear,
+                                                                  String fromTime, String toTime) {
+        return financialReportService.expenseIncomeSituation(type, year, toYear, inputDto.getWalletIds(), fromTime, toTime);
     }
 
     @ApiOperation("Chi tiết thu chi theo từng danh mục")
-    @GetMapping("/detail-category")
-    public DetailReportOutputDto getDetailReport(String type, String time, String toTime, String timeType, Long walletId) {
-        return financialReportService.getDetailReport(type, time, toTime, timeType, walletId);
+    @PutMapping("/detail-category")
+    public DetailReportOutputDto getDetailReport(@RequestBody ReportSituationInputDto inputDto, String type, String time,
+                                                 String toTime, String timeType) {
+        return financialReportService.getDetailReport(type, time, toTime, timeType, inputDto.getWalletIds());
     }
 
     @ApiOperation("Phân tích chi tiêu và thu")
     @PutMapping("/statistic")
     public ReportStatisticOutputDto expenseAnalysis(@RequestBody ReportStatisticInputDto inputDto,
                                                     String type, String timeType, String fromTime, String toTime) {
-        return financialReportService.expenseAnalysis(type, timeType, fromTime, toTime, inputDto.getCategoryIds(), inputDto.getWalletIds());
+        return financialReportService.expenseIncomeAnalysis(type, timeType, fromTime, toTime, inputDto.getCategoryIds(), inputDto.getWalletIds());
     }
 
 
