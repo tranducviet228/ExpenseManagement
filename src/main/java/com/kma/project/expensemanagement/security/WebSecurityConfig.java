@@ -75,6 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/v1/**", //test
                         "/api/auth/**")
                 .permitAll()
+                .antMatchers("/api/admin/**").access("hasRole('ROLE_ADMIN')")
                 .antMatchers("/api/test/**").permitAll()
                 .anyRequest().authenticated();
 

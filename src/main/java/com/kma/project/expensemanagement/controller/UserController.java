@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/admin/users")
 @Api(tags = "Quản lí người dùng")
 public class UserController {
     @Autowired
