@@ -21,4 +21,8 @@ public class UserOutputDto {
 
     private Set<RoleOutputDto> roles;
 
+    private String fullName;
+
+    private String phone;
+
 }

@@ -8,5 +8,8 @@ public interface CategoryLogoService {
 
     void add(MultipartFile[] files);
 
+    void delete(Long id);
+
     PageResponse<CategoryLogoOutputDto> getAll(Integer page, Integer size, String sort);
+
 }

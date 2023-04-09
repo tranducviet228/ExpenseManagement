@@ -25,4 +25,9 @@ public class SignUpRequest {
     private String password;
 
     private List<String> roles;
+
+    private String fullName;
+
+    private String phone;
+
 }

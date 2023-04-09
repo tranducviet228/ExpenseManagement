@@ -72,7 +72,9 @@ public class UserServiceImpl implements UserService {
         // Create new user's account
         UserEntity user = new UserEntity(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                passwordEncoder.encode(signUpRequest.getPassword()));
+                passwordEncoder.encode(signUpRequest.getPassword()),
+                signUpRequest.getFullName(),
+                signUpRequest.getPhone());
 
         Set<RoleEntity> roles = new HashSet<>();
         RoleEntity userRole;

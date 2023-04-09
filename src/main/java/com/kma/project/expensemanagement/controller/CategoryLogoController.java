@@ -24,6 +24,12 @@ public class CategoryLogoController {
         categoryLogoService.add(files);
     }
 
+    @ApiOperation(value = "Xóa logo danh mục")
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable("id") Long id) {
+        categoryLogoService.delete(id);
+    }
+
     @ApiOperation(value = "Lấy danh sách logo danh mục ")
     @GetMapping
     public PageResponse<CategoryLogoOutputDto> getAll(Integer page, Integer size, String sort) {

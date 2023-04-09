@@ -34,9 +34,16 @@ public class UserEntity extends BaseEntity {
 
     private String otp;
 
-    public UserEntity(String username, String email, String encode) {
+    @Column(name = "full_name")
+    private String fullName;
+
+    private String phone;
+
+    public UserEntity(String username, String email, String encode, String fullName, String phone) {
         this.username = username;
         this.email = email;
         this.password = encode;
+        this.fullName = fullName;
+        this.phone = phone;
     }
 }
