@@ -54,6 +54,9 @@ public class CategoryServiceImpl implements CategoryService {
             logoRepository.findById(inputDto.getLogoImageID())
                     .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.logo-not-found")).build());
         }
+        if (inputDto.getParentId() == null) {
+            categoryEntity.setParentId(0L);
+        }
         categoryEntity.setCreatedBy(jwtUtils.getCurrentUserId());
         repository.save(categoryEntity);
         return mapper.convertToDto(categoryEntity);
