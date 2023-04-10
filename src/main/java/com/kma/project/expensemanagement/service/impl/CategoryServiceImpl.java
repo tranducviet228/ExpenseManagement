@@ -121,6 +121,17 @@ public class CategoryServiceImpl implements CategoryService {
                         , jwtUtils.getCurrentUserId())
                 .stream().map(categoryEntity -> mapper.convertToDto(categoryEntity)).collect(Collectors.toList());
 
+        List<Long> logoIds = new ArrayList<>();
+        categoryOutputs.forEach(categoryDto -> logoIds.add(categoryDto.getLogoImageID()));
+        List<CategoryLogoEntity> logoEntities = logoRepository.getAllByIdIn(logoIds);
+        Map<Long, CategoryLogoEntity> mapLogo = logoEntities.stream().collect(Collectors.toMap(CategoryLogoEntity::getId, Function.identity()));
+
+        categoryOutputs.forEach(categoryOutputDto -> {
+            if (categoryOutputDto.getLogoImageID() != null && mapLogo.get(categoryOutputDto.getLogoImageID()) != null) {
+                categoryOutputDto.setLogoImageUrl(mapLogo.get(categoryOutputDto.getLogoImageID()).getFileUrl());
+            }
+        });
+
         // tìm ra những thằng cha
         List<CategoryOutputDto> cateList = new ArrayList<>(categoryOutputs);
         cateList.forEach(item -> {
