@@ -43,6 +43,7 @@ public final class PageUtils {
         pageResponse.setPageNumber(page.getNumber() + 1);
         pageResponse.setPageSize(page.getSize());
         pageResponse.setTotalRecord(page.getTotalElements());
+        pageResponse.setTotalPage(page.getTotalPages());
         return pageResponse;
     }
 }

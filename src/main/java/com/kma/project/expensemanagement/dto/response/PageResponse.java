@@ -20,4 +20,6 @@ public class PageResponse<T> {
     private Integer pageSize;
 
     private Long totalRecord;
+
+    private Integer totalPage;
 }
