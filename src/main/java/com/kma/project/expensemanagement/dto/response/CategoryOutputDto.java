@@ -26,7 +26,7 @@ public class CategoryOutputDto {
 
     private Long logoImageID;
 
-    private String logoImageUrl;
+    private Object logoImage;
 
     private List<CategoryOutputDto> childCategory;
 

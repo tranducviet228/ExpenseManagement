@@ -91,7 +91,7 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryLogoEntity logoEntity = logoRepository.findById(categoryEntity.getLogoImageID())
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.logo-not-found")).build());
         CategoryOutputDto categoryOutputDto = mapper.convertToDto(categoryEntity);
-        categoryOutputDto.setLogoImageUrl(logoEntity.getFileUrl());
+        categoryOutputDto.setLogoImage(logoEntity);
         return DataUtils.formatData(categoryOutputDto);
     }
 
@@ -109,7 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
         return PageUtils.formatPageResponse(categoryPage.map(categoryEntity -> {
             CategoryOutputDto categoryOutputDto = mapper.convertToDto(categoryEntity);
             if (mapLogo.get(categoryEntity.getLogoImageID()) != null) {
-                categoryOutputDto.setLogoImageUrl(mapLogo.get(categoryEntity.getLogoImageID()).getFileUrl());
+                categoryOutputDto.setLogoImage(mapLogo.get(categoryEntity.getLogoImageID()).getFileUrl());
             }
             return categoryOutputDto;
         }));
@@ -128,7 +128,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         categoryOutputs.forEach(categoryOutputDto -> {
             if (categoryOutputDto.getLogoImageID() != null && mapLogo.get(categoryOutputDto.getLogoImageID()) != null) {
-                categoryOutputDto.setLogoImageUrl(mapLogo.get(categoryOutputDto.getLogoImageID()).getFileUrl());
+                categoryOutputDto.setLogoImage(mapLogo.get(categoryOutputDto.getLogoImageID()).getFileUrl());
             }
         });
 
