@@ -16,7 +16,7 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
 
     Page<CategoryEntity> findAllByNameLikeIgnoreCaseAndParentId(Pageable pageable, String search, Long parentId);
 
-    List<CategoryEntity> findAllByNameLikeIgnoreCaseAndCreatedBy(String search, Long createdBy);
+    List<CategoryEntity> findAllByNameLikeIgnoreCaseAndCreatedByAndCategoryType(String search, Long createdBy, CategoryType type);
 
     @Query(value = " select c.id from CategoryEntity c where c.categoryType = :categoryType and c.createdBy = :userId ")
     List<Long> getAllCategoryId(@Param("categoryType") CategoryType categoryType,

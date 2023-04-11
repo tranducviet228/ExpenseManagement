@@ -6,6 +6,7 @@ import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.CategoryLogoEntity;
+import com.kma.project.expensemanagement.enums.CategoryType;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.CategoryMapper;
 import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
@@ -116,9 +117,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Set<CategoryOutputDto> getAllCategory(String search) {
-        List<CategoryOutputDto> categoryOutputs = repository.findAllByNameLikeIgnoreCaseAndCreatedBy(PageUtils.buildSearch(search)
-                        , jwtUtils.getCurrentUserId())
+    public Set<CategoryOutputDto> getAllCategory(String search, String type) {
+        List<CategoryOutputDto> categoryOutputs = repository.findAllByNameLikeIgnoreCaseAndCreatedByAndCategoryType(PageUtils.buildSearch(search)
+                        , jwtUtils.getCurrentUserId(), Enum.valueOf(CategoryType.class, type))
                 .stream().map(categoryEntity -> mapper.convertToDto(categoryEntity)).collect(Collectors.toList());
 
         List<Long> logoIds = new ArrayList<>();

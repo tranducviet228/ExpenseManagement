@@ -54,7 +54,7 @@ public class CategoryController {
 
     @ApiOperation(value = "Lấy tất cả danh mục thu chi")
     @GetMapping("/all")
-    public Set<CategoryOutputDto> getAll(String search) {
-        return categoryService.getAllCategory(search);
+    public Set<CategoryOutputDto> getAll(String search, @RequestParam String type) {
+        return categoryService.getAllCategory(search, type);
     }
 }

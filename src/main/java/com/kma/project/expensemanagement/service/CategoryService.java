@@ -19,6 +19,6 @@ public interface CategoryService {
 
     PageResponse<CategoryOutputDto> getAllCategoryByParentId(Integer page, Integer size, String sort, String search, Long parentId);
 
-    Set<CategoryOutputDto> getAllCategory(String search);
+    Set<CategoryOutputDto> getAllCategory(String search, String type);
 
 }
