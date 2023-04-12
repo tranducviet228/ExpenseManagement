@@ -100,7 +100,8 @@ public class CategoryServiceImpl implements CategoryService {
     public PageResponse<CategoryOutputDto> getAllCategoryByParentId(Integer page, Integer size, String sort, String search, Long parentId) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         parentId = parentId == null ? 0 : parentId;
-        Page<CategoryEntity> categoryPage = repository.findAllByNameLikeIgnoreCaseAndParentId(pageable, PageUtils.buildSearch(search), parentId);
+        Page<CategoryEntity> categoryPage = repository
+                .findAllByNameLikeIgnoreCaseAndParentIdAndCreatedBy(pageable, PageUtils.buildSearch(search), parentId, jwtUtils.getCurrentUserId());
 
         List<Long> logoIds = new ArrayList<>();
         categoryPage.forEach(categoryEntity -> logoIds.add(categoryEntity.getLogoImageID()));
@@ -127,16 +128,22 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryLogoEntity> logoEntities = logoRepository.getAllByIdIn(logoIds);
         Map<Long, CategoryLogoEntity> mapLogo = logoEntities.stream().collect(Collectors.toMap(CategoryLogoEntity::getId, Function.identity()));
 
+        Set<Long> categoryIds = new HashSet<>();
         categoryOutputs.forEach(categoryOutputDto -> {
             if (categoryOutputDto.getLogoImageID() != null && mapLogo.get(categoryOutputDto.getLogoImageID()) != null) {
                 categoryOutputDto.setLogoImage(mapLogo.get(categoryOutputDto.getLogoImageID()).getFileUrl());
             }
+            categoryIds.add(categoryOutputDto.getId());
         });
 
         // tìm ra những thằng cha
         List<CategoryOutputDto> cateList = new ArrayList<>(categoryOutputs);
         cateList.forEach(item -> {
-            repository.findById(item.getParentId()).ifPresent(category -> categoryOutputs.add(mapper.convertToDto(category)));
+            repository.findById(item.getParentId()).ifPresent(category -> {
+                if (!categoryIds.contains(category.getId())) {
+                    categoryOutputs.add(mapper.convertToDto(category));
+                }
+            });
         });
         Set<CategoryOutputDto> categoryParent = categoryOutputs.stream()
                 .filter(n -> n.getParentId().equals(0L))

@@ -14,7 +14,8 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-    Page<CategoryEntity> findAllByNameLikeIgnoreCaseAndParentId(Pageable pageable, String search, Long parentId);
+    Page<CategoryEntity> findAllByNameLikeIgnoreCaseAndParentIdAndCreatedBy(Pageable pageable, String search, Long parentId,
+                                                                            Long createdBy);
 
     List<CategoryEntity> findAllByNameLikeIgnoreCaseAndCreatedByAndCategoryType(String search, Long createdBy, CategoryType type);
 
