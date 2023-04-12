@@ -215,6 +215,12 @@ public class UserServiceImpl implements UserService {
             }
         }
         userEntity.setRoles(roles);
+        if (dto.getPhone() != null) {
+            userEntity.setPhone(dto.getPhone());
+        }
+        if (dto.getFullName() != null) {
+            userEntity.setFullName(dto.getFullName());
+        }
         userRepository.save(userEntity);
         return userMapper.convertToDto(userEntity);
     }
