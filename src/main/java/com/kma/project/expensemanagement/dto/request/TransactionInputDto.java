@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +17,7 @@ import javax.validation.constraints.Pattern;
 public class TransactionInputDto {
 
     @Min(value = 0, message = "{error.amount-not-valid}")
-    private Long amount;
+    private BigDecimal amount;
 
     private Long categoryId;
 
