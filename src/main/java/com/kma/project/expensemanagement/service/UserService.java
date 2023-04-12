@@ -1,7 +1,7 @@
 package com.kma.project.expensemanagement.service;
 
 import com.kma.project.expensemanagement.dto.authen.*;
-import com.kma.project.expensemanagement.dto.request.UserInputDto;
+import com.kma.project.expensemanagement.dto.request.UserUpdateDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.UserOutputDto;
 import com.kma.project.expensemanagement.exception.AppResponseDto;
@@ -20,7 +20,7 @@ public interface UserService {
 
     PageResponse<UserOutputDto> getAllUser(Integer page, Integer size, String sort, String search);
 
-    UserOutputDto updateUser(Long userId, UserInputDto dto);
+    UserOutputDto updateUser(Long userId, UserUpdateDto dto);
 
     void delete(Long userId);
 

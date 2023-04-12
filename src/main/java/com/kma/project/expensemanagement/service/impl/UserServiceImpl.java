@@ -1,7 +1,7 @@
 package com.kma.project.expensemanagement.service.impl;
 
 import com.kma.project.expensemanagement.dto.authen.*;
-import com.kma.project.expensemanagement.dto.request.UserInputDto;
+import com.kma.project.expensemanagement.dto.request.UserUpdateDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.UserOutputDto;
 import com.kma.project.expensemanagement.entity.RefreshToken;
@@ -183,7 +183,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserOutputDto updateUser(Long userId, UserInputDto dto) {
+    public UserOutputDto updateUser(Long userId, UserUpdateDto dto) {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.entity-not-found")).build());
         if (!userEntity.getUsername().equals(dto.getUsername()) && dto.getUsername() != null) {

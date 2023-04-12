@@ -1,7 +1,7 @@
 package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.authen.SignUpRequest;
-import com.kma.project.expensemanagement.dto.request.UserInputDto;
+import com.kma.project.expensemanagement.dto.request.UserUpdateDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.UserOutputDto;
 import com.kma.project.expensemanagement.service.UserService;
@@ -35,7 +35,7 @@ public class UserController {
 
     @ApiOperation(value = "Cập nhật tài khoản")
     @PutMapping("{id}")
-    public ResponseEntity<?> updateUser(@Valid @RequestBody UserInputDto request, @PathVariable("id") Long userId) {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdateDto request, @PathVariable("id") Long userId) {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }
 
