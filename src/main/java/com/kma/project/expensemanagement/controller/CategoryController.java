@@ -2,6 +2,7 @@ package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.request.CategoryInputDto;
 import com.kma.project.expensemanagement.dto.response.CategoryOutputDto;
+import com.kma.project.expensemanagement.dto.response.ContentResponse;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.service.CategoryService;
@@ -54,7 +55,7 @@ public class CategoryController {
 
     @ApiOperation(value = "Lấy tất cả danh mục thu chi")
     @GetMapping("/all")
-    public Set<CategoryOutputDto> getAll(String search, @RequestParam String type) {
+    public ContentResponse<Set<CategoryOutputDto>> getAll(String search, @RequestParam String type) {
         return categoryService.getAllCategory(search, type);
     }
 }

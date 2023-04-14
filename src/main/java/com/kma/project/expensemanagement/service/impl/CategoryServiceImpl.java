@@ -2,6 +2,7 @@ package com.kma.project.expensemanagement.service.impl;
 
 import com.kma.project.expensemanagement.dto.request.CategoryInputDto;
 import com.kma.project.expensemanagement.dto.response.CategoryOutputDto;
+import com.kma.project.expensemanagement.dto.response.ContentResponse;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.entity.CategoryEntity;
@@ -118,7 +119,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Set<CategoryOutputDto> getAllCategory(String search, String type) {
+    public ContentResponse<Set<CategoryOutputDto>> getAllCategory(String search, String type) {
         List<CategoryOutputDto> categoryOutputs = repository.findAllByNameLikeIgnoreCaseAndCreatedByAndCategoryType(PageUtils.buildSearch(search)
                         , jwtUtils.getCurrentUserId(), Enum.valueOf(CategoryType.class, type))
                 .stream().map(categoryEntity -> mapper.convertToDto(categoryEntity)).collect(Collectors.toList());
@@ -167,7 +168,7 @@ public class CategoryServiceImpl implements CategoryService {
                 item.setChildCategory(map.get(item.getId()));
             }
         });
-        return categoryParent;
+        return DataUtils.formatContent(categoryParent);
     }
 
 }
