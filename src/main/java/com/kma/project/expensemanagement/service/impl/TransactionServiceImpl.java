@@ -63,10 +63,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionOutputDto add(TransactionInputDto inputDto) {
         TransactionEntity entity = mapper.convertToEntity(inputDto);
-        if (inputDto.getImageFile() != null) {
-            String fileUrl = uploadFileService.uploadFileCloud(inputDto.getImageFile());
-            entity.setImageUrl(fileUrl);
-        }
+//        if (inputDto.getImageFile() != null) {
+//            String fileUrl = uploadFileService.uploadFileCloud(inputDto.getImageFile());
+//            entity.setImageUrl(fileUrl);
+//        }
 
         CategoryEntity category = categoryRepository.findById(inputDto.getCategoryId())
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.category-not-found")).build());
@@ -99,10 +99,10 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionEntity entity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.transaction-not-found")).build());
 
-        if (inputDto.getImageFile() != null) {
-            String fileUrl = uploadFileService.uploadFileCloud(inputDto.getImageFile());
-            entity.setImageUrl(fileUrl);
-        }
+//        if (inputDto.getImageFile() != null) {
+//            String fileUrl = uploadFileService.uploadFileCloud(inputDto.getImageFile());
+//            entity.setImageUrl(fileUrl);
+//        }
         if (inputDto.getCategoryId() != null) {
             CategoryEntity category = categoryRepository.findById(inputDto.getCategoryId())
                     .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.category-not-found")).build());
