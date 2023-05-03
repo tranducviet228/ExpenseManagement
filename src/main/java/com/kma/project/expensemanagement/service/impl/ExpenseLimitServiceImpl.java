@@ -52,11 +52,19 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
     @Override
     public void updateToLimit(TransactionInputDto inputDto) {
         List<ExpenseLimitEntity> listLimit = repository
-                .getValidExpenseLimit(inputDto.getCategoryId(), inputDto.getWalletId(), LocalDate.now());
+                .getValidExpenseLimit(inputDto.getCategoryId().toString(), inputDto.getWalletId().toString(), LocalDate.now());
+
         for (ExpenseLimitEntity entity : listLimit) {
             entity.setActualAmount(entity.getActualAmount().add(inputDto.getAmount()));
             repository.save(entity);
+
+            if (entity.getActualAmount().compareTo(entity.getAmount()) > 0) {
+                // bắn noti lên app
+
+            }
         }
+
+
     }
 
     @Transactional
@@ -64,6 +72,7 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
     public ExpenseLimitOutputDto add(ExpenseLimitInputDto inputDto) {
         ExpenseLimitEntity entity = mapper.convertToEntity(inputDto);
         entity.setActualAmount(BigDecimal.ZERO);
+        entity.setCreatedBy(jwtUtils.getCurrentUserId());
         checkExist(inputDto);
         repository.save(entity);
         return mapper.convertToOutputDto(entity);
@@ -113,8 +122,6 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         search = PageUtils.buildSearch(search);
         Page<ExpenseLimitEntity> pageUser = repository.getAllByCreatedByAndLimitNameLikeIgnoreCase(pageable, jwtUtils.getCurrentUserId(), search);
-        return PageUtils.formatPageResponse(pageUser.map(userEntity -> {
-            return mapper.convertToOutputDto(userEntity);
-        }));
+        return PageUtils.formatPageResponse(pageUser.map(userEntity -> mapper.convertToOutputDto(userEntity)));
     }
 }

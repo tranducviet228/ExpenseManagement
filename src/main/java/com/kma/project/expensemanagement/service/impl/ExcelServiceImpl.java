@@ -3,6 +3,8 @@ package com.kma.project.expensemanagement.service.impl;
 import com.kma.project.expensemanagement.dto.response.ResourceDto;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.repository.TransactionRepository;
+import com.kma.project.expensemanagement.repository.WalletRepository;
+import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.ExcelService;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,9 +26,24 @@ public class ExcelServiceImpl implements ExcelService {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    JwtUtils jwtUtils;
+    @Autowired
+    private WalletRepository walletRepository;
+
     @Override
-    public ResourceDto exportData() {
-        List<TransactionEntity> tranList = transactionRepository.findAll();
+    public ResourceDto exportData(String fromDate, String toDate, List<Long> walletIds) {
+
+        LocalDate fromDates = fromDate == null ? LocalDate.now() : LocalDate.parse(fromDate);
+        LocalDate toDates = toDate == null ? LocalDate.now() : LocalDate.parse(toDate);
+
+        LocalDateTime firstDate = fromDates.atTime(0, 0, 0);
+        LocalDateTime lastDate = toDates.atTime(23, 59, 59);
+
+        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
+
+        List<TransactionEntity> tranList = transactionRepository
+                .findAllTransactionByAriseDate(firstDate, lastDate, walletIds, jwtUtils.getCurrentUserId());
         Resource resource = prepareExcel(tranList);
         return ResourceDto.builder().resource(resource).
                 mediaType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")).build();

@@ -19,6 +19,8 @@ public class ExpenseLimitOutputDto {
 
     private BigDecimal amount;
 
+    private BigDecimal actualAmount;
+
     private String limitName;
 
     private List<String> categoryIds;

@@ -14,7 +14,7 @@ public interface ExpenseRepository extends JpaRepository<ExpenseLimitEntity, Lon
     Page<ExpenseLimitEntity> getAllByCreatedByAndLimitNameLikeIgnoreCase(Pageable pageable, Long userId, String search);
 
     @Query(value = " select * from expense_limits where " +
-            " :categoryId = any(category_ids) and :walletId = any(wallet_ids) " +
-            " and (from_date <= :date and (to_date >= :date or to_date is null) )", nativeQuery = true)
-    List<ExpenseLimitEntity> getValidExpenseLimit(Long categoryId, Long walletId, LocalDate date);
+            " (:categoryId = any(category_ids)) and (:walletId = any(wallet_ids)) " +
+            " and (from_date <= :date and (to_date >= :date or to_date is null) ) ", nativeQuery = true)
+    List<ExpenseLimitEntity> getValidExpenseLimit(String categoryId, String walletId, LocalDate date);
 }
