@@ -22,6 +22,8 @@ public class TransactionOutputDto {
 
     private String categoryName;
 
+    private String categoryLogo;
+
     private String description;
 
     private LocalDateTime ariseDate;

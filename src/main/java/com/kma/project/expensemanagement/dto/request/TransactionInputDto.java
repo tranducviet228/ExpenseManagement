@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -31,7 +30,7 @@ public class TransactionInputDto {
     @Pattern(regexp = "^(EXPENSE|INCOME)", message = "{error.transaction-type-not-valid}")
     private String transactionType;
 
-    private MultipartFile imageFile;
+//    private MultipartFile imageFile;
 
     private LocalDateTime ariseDate;
 
