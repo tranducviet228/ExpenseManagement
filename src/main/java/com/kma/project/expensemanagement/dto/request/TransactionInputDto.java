@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -31,5 +32,7 @@ public class TransactionInputDto {
     private String transactionType;
 
     private MultipartFile imageFile;
+
+    private LocalDateTime ariseDate;
 
 }

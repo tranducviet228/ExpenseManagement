@@ -5,6 +5,7 @@ import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.TransactionOutputDto;
 import com.kma.project.expensemanagement.entity.CategoryEntity;
+import com.kma.project.expensemanagement.entity.CategoryLogoEntity;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.exception.AppException;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Optional;
 
 @Transactional(readOnly = true)
 @Service
@@ -163,5 +165,8 @@ public class TransactionServiceImpl implements TransactionService {
     public void mapDataResponse(TransactionOutputDto outputDto, TransactionEntity entity) {
         outputDto.setCategoryName(entity.getCategory().getName());
         outputDto.setWalletName(entity.getWallet().getName());
+
+        Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
+        categoryLogoEntity.ifPresent(logoEntity -> outputDto.setCategoryLogo(logoEntity.getFileUrl()));
     }
 }
