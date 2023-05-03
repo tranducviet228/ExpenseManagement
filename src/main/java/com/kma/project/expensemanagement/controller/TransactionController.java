@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -67,8 +68,8 @@ public class TransactionController {
     }
 
     @GetMapping("export")
-    public ResponseEntity<Resource> exportData() {
-        ResourceDto resourceDTO = excelService.exportData();
+    public ResponseEntity<Resource> exportData(String fromDate, String toDate, List<Long> walletIds) {
+        ResourceDto resourceDTO = excelService.exportData(fromDate, toDate, walletIds);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Disposition",

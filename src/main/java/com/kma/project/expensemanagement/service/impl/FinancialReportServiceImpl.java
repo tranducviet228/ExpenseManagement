@@ -65,7 +65,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     }
 
     @Override
-    public FinancialStatementOutputDto financialStatement(Long walletId, String localDate) {
+    public FinancialStatementOutputDto financialStatement(Long walletId, String fromDate, String toDate) {
 
         BigDecimal accountBalance;
         if (walletId != null) {
@@ -76,8 +76,8 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             accountBalance = walletService.getInfoAllWallet().getMoneyTotal();
         }
 
-        LocalDate firstDateInMonth = localDate == null ? LocalDate.now().withDayOfMonth(1) : LocalDate.parse(localDate).withDayOfMonth(1);
-        LocalDate lastDateInMonth = firstDateInMonth.withDayOfMonth(firstDateInMonth.lengthOfMonth());
+        LocalDate firstDateInMonth = fromDate == null ? LocalDate.now().withDayOfMonth(1) : LocalDate.parse(fromDate).withDayOfMonth(1);
+        LocalDate lastDateInMonth = toDate == null ? firstDateInMonth.withDayOfMonth(firstDateInMonth.lengthOfMonth()) : LocalDate.parse(toDate);
 
         LocalDateTime firstDate = firstDateInMonth.atTime(0, 0, 0);
         LocalDateTime lastDate = lastDateInMonth.atTime(23, 59, 59);

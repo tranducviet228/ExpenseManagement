@@ -10,7 +10,7 @@ import java.util.List;
 public interface FinancialReportService {
 
     // tài chính hiện tại
-    FinancialStatementOutputDto financialStatement(Long walletId, String localDate);
+    FinancialStatementOutputDto financialStatement(Long walletId, String fromDate, String toDate);
 
     // tình hình thu chi hiện tại
 //    CurrentSituationOutputDto currentExpenseIncomeSituation(Long walletId);

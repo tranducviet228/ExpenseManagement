@@ -23,8 +23,8 @@ public class FinancialReportController {
 
     @ApiOperation("Tài chính hiện tại")
     @GetMapping("/")
-    public FinancialStatementOutputDto getFinancialStatement(Long walletId, String localDate) {
-        return financialReportService.financialStatement(walletId, localDate);
+    public FinancialStatementOutputDto getFinancialStatement(Long walletId, String fromDate, String toDate) {
+        return financialReportService.financialStatement(walletId, fromDate, toDate);
     }
 
 //    @ApiOperation("Tình hình thu chi hiện tại")
