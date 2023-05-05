@@ -162,9 +162,11 @@ public class TransactionServiceImpl implements TransactionService {
         }));
     }
 
+    @Override
     public void mapDataResponse(TransactionOutputDto outputDto, TransactionEntity entity) {
         outputDto.setCategoryName(entity.getCategory().getName());
         outputDto.setWalletName(entity.getWallet().getName());
+        outputDto.setWalletType(entity.getWallet().getAccountType());
 
         Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
         categoryLogoEntity.ifPresent(logoEntity -> outputDto.setCategoryLogo(logoEntity.getFileUrl()));

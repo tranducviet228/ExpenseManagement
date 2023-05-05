@@ -32,6 +32,8 @@ public class TransactionOutputDto {
 
     private String walletName;
 
+    private String walletType;
+
     private boolean addToReport;
 
     private String transactionType;

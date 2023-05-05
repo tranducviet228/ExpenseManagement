@@ -13,6 +13,7 @@ import com.kma.project.expensemanagement.repository.TransactionRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.FinancialReportService;
+import com.kma.project.expensemanagement.service.TransactionService;
 import com.kma.project.expensemanagement.service.WalletService;
 import com.kma.project.expensemanagement.utils.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    TransactionService transactionService;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -134,18 +138,23 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
     // get all Transaction in fromDate to toDate
     private List<TransactionOutputDto> getAllTransaction(Long walletId, LocalDateTime firstDate, LocalDateTime lastDate) {
+        List<TransactionEntity> transactionEntityList = null;
         List<TransactionOutputDto> transactionOutputs = null;
         // get current balance
         if (walletId != null) {
             // get all transaction in month
-            transactionOutputs = transactionRepository
-                    .findAllTransactionByWalletId(firstDate, lastDate, List.of(walletId), jwtUtils.getCurrentUserId())
-                    .stream().map(entity -> transactionMapper.convertToDto(entity)).collect(Collectors.toList());
+            transactionEntityList = transactionRepository
+                    .findAllTransactionByWalletId(firstDate, lastDate, List.of(walletId), jwtUtils.getCurrentUserId());
+
         } else {
             // get all transaction in all wallet
-            transactionOutputs = transactionRepository.findAllInMonth(firstDate, lastDate, jwtUtils.getCurrentUserId())
-                    .stream().map(entity -> transactionMapper.convertToDto(entity)).collect(Collectors.toList());
+            transactionEntityList = transactionRepository.findAllInMonth(firstDate, lastDate, jwtUtils.getCurrentUserId());
         }
+        transactionOutputs = transactionEntityList.stream().map(entity -> {
+            TransactionOutputDto outputDto = transactionMapper.convertToDto(entity);
+            transactionService.mapDataResponse(outputDto, entity);
+            return outputDto;
+        }).collect(Collectors.toList());
         return transactionOutputs;
     }
 
