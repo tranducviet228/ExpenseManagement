@@ -174,7 +174,9 @@ public class TransactionServiceImpl implements TransactionService {
         outputDto.setWalletId(entity.getWallet().getId());
         outputDto.setWalletType(entity.getWallet().getAccountType());
 
-        Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
-        categoryLogoEntity.ifPresent(logoEntity -> outputDto.setCategoryLogo(logoEntity.getFileUrl()));
+        if (entity.getCategory().getLogoImageID() != null) {
+            Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
+            categoryLogoEntity.ifPresent(logoEntity -> outputDto.setCategoryLogo(logoEntity.getFileUrl()));
+        }
     }
 }
