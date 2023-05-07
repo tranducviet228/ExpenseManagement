@@ -89,8 +89,11 @@ public class TransactionServiceImpl implements TransactionService {
 
         // update expense limit
         expenseLimitService.updateToLimit(inputDto);
+        TransactionOutputDto transactionOutputDto = mapper.convertToDto(entity);
+        transactionOutputDto.setWalletId(entity.getWallet().getId());
+        transactionOutputDto.setCategoryId(entity.getCategory().getId());
 
-        return mapper.convertToDto(entity);
+        return transactionOutputDto;
     }
 
     @Transactional
