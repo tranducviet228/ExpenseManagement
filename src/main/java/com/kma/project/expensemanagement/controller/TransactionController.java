@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,9 +42,15 @@ public class TransactionController {
         return transactionService.add(inputDto);
     }
 
+//    @ApiOperation(value = "Cập nhật giao dịch")
+//    @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public TransactionOutputDto update(@PathVariable("id") Long id, @ModelAttribute TransactionInputDto inputDto) {
+//        return transactionService.update(id, inputDto);
+//    }
+
     @ApiOperation(value = "Cập nhật giao dịch")
-    @PostMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public TransactionOutputDto update(@PathVariable("id") Long id, @ModelAttribute TransactionInputDto inputDto) {
+    @PutMapping(value = "/{id}")
+    public TransactionOutputDto update(@PathVariable("id") Long id, @RequestBody TransactionInputDto inputDto) {
         return transactionService.update(id, inputDto);
     }
 
