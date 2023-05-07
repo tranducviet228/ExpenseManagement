@@ -125,7 +125,10 @@ public class TransactionServiceImpl implements TransactionService {
         }
         mapper.update(inputDto, entity);
         repository.save(entity);
-        return mapper.convertToDto(entity);
+        TransactionOutputDto transactionOutputDto = mapper.convertToDto(entity);
+        transactionOutputDto.setWalletId(entity.getWallet().getId());
+        transactionOutputDto.setCategoryId(entity.getCategory().getId());
+        return transactionOutputDto;
     }
 
     @Transactional
@@ -165,7 +168,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void mapDataResponse(TransactionOutputDto outputDto, TransactionEntity entity) {
         outputDto.setCategoryName(entity.getCategory().getName());
+        outputDto.setCategoryId(entity.getCategory().getId());
         outputDto.setWalletName(entity.getWallet().getName());
+        outputDto.setWalletId(entity.getWallet().getId());
         outputDto.setWalletType(entity.getWallet().getAccountType());
 
         Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
