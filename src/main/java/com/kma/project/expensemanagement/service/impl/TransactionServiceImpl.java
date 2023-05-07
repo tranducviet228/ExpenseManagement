@@ -90,8 +90,7 @@ public class TransactionServiceImpl implements TransactionService {
         // update expense limit
         expenseLimitService.updateToLimit(inputDto);
         TransactionOutputDto transactionOutputDto = mapper.convertToDto(entity);
-        transactionOutputDto.setWalletId(entity.getWallet().getId());
-        transactionOutputDto.setCategoryId(entity.getCategory().getId());
+        mapDataResponse(transactionOutputDto, entity);
 
         return transactionOutputDto;
     }
@@ -129,8 +128,7 @@ public class TransactionServiceImpl implements TransactionService {
         mapper.update(inputDto, entity);
         repository.save(entity);
         TransactionOutputDto transactionOutputDto = mapper.convertToDto(entity);
-        transactionOutputDto.setWalletId(entity.getWallet().getId());
-        transactionOutputDto.setCategoryId(entity.getCategory().getId());
+        mapDataResponse(transactionOutputDto, entity);
         return transactionOutputDto;
     }
 
