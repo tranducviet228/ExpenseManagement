@@ -4,13 +4,16 @@ import com.kma.project.expensemanagement.dto.authen.*;
 import com.kma.project.expensemanagement.dto.request.UserUpdateDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.UserOutputDto;
+import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.RefreshToken;
 import com.kma.project.expensemanagement.entity.RoleEntity;
 import com.kma.project.expensemanagement.entity.UserEntity;
 import com.kma.project.expensemanagement.enums.ERole;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.exception.AppResponseDto;
+import com.kma.project.expensemanagement.mapper.CategoryMapper;
 import com.kma.project.expensemanagement.mapper.UserMapper;
+import com.kma.project.expensemanagement.repository.CategoryRepository;
 import com.kma.project.expensemanagement.repository.RoleRepository;
 import com.kma.project.expensemanagement.repository.UserRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
@@ -56,6 +59,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
+
     @Value("${viet.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
@@ -78,7 +87,7 @@ public class UserServiceImpl implements UserService {
 
         Set<RoleEntity> roles = new HashSet<>();
         RoleEntity userRole;
-        if (!signUpRequest.getRoles().isEmpty()) {
+        if (signUpRequest.getRoles() != null && !signUpRequest.getRoles().isEmpty()) {
             for (String item : signUpRequest.getRoles()) {
                 userRole = roleRepository.findByName(ERole.valueOf(item))
                         .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.role-not-exist")).build());
@@ -91,7 +100,56 @@ public class UserServiceImpl implements UserService {
         }
         user.setRoles(roles);
         userRepository.save(user);
+        createCategory(user);
         return AppResponseDto.builder().httpStatus(200).message("Đăng kí thành công").build();
+    }
+
+    public void createCategory(UserEntity userEntity) {
+        List<CategoryEntity> categoryEntities = categoryRepository.getAllCategoryCreateByAdmin(ERole.ROLE_ADMIN.name());
+        List<CategoryEntity> parentCopyCategories = new ArrayList<>();
+
+        // insert parent category
+        Set<Long> parentCategoryIds = new HashSet<>();
+        Map<Long, Long> newCategoryMap = new HashMap<>();
+        categoryEntities.forEach(categoryEntity -> {
+            parentCategoryIds.add(categoryEntity.getId());
+            CategoryEntity category = categoryMapper.createNewEntity(categoryEntity);
+            category.setId(null);
+            category.setCreatedBy(userEntity.getId());
+            categoryRepository.save(category);
+            newCategoryMap.put(categoryEntity.getId(), category.getId());
+            parentCopyCategories.add(category);
+        });
+
+//        categoryRepository.saveAll(parentCopyCategories);
+
+        List<CategoryEntity> childCategories = categoryRepository.findAllByParentIdIn(parentCategoryIds);
+        Map<Long, List<CategoryEntity>> map = new HashMap<>();
+        for (CategoryEntity category : childCategories) {
+            List<CategoryEntity> categoryList;
+            if (map.get(category.getParentId()) == null) {
+                categoryList = new ArrayList<>();
+            } else {
+                categoryList = map.get(category.getParentId());
+            }
+            categoryList.add(category);
+            map.put(category.getParentId(), categoryList);
+        }
+
+        List<CategoryEntity> childCopyCategories = new ArrayList<>();
+        categoryEntities.forEach(entity -> {
+            if (map.get(entity.getId()) != null) {
+                for (CategoryEntity category : map.get(entity.getId())) {
+                    CategoryEntity childCategory = categoryMapper.createNewEntity(category);
+                    childCategory.setId(null);
+                    childCategory.setCreatedBy(userEntity.getId());
+                    childCategory.setParentId(newCategoryMap.get(entity.getId()));
+                    childCopyCategories.add(childCategory);
+                }
+            }
+        });
+        categoryRepository.saveAll(childCopyCategories);
+
     }
 
     @Transactional

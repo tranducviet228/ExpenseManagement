@@ -11,7 +11,7 @@ import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.ExpenseLimitMapper;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
-import com.kma.project.expensemanagement.repository.ExpenseRepository;
+import com.kma.project.expensemanagement.repository.ExpenseLimitRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.ExpenseLimitService;
@@ -34,7 +34,7 @@ import java.util.List;
 public class ExpenseLimitServiceImpl implements ExpenseLimitService {
 
     @Autowired
-    ExpenseRepository repository;
+    ExpenseLimitRepository repository;
 
     @Autowired
     CategoryRepository categoryRepository;

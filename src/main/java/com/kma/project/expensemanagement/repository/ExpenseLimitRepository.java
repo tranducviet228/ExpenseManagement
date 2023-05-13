@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface ExpenseRepository extends JpaRepository<ExpenseLimitEntity, Long> {
+public interface ExpenseLimitRepository extends JpaRepository<ExpenseLimitEntity, Long> {
 
     Page<ExpenseLimitEntity> getAllByCreatedByAndLimitNameLikeIgnoreCase(Pageable pageable, Long userId, String search);
 

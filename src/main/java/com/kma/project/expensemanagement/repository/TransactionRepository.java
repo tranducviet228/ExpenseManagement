@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.repository;
 
+import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.enums.TransactionType;
 import org.springframework.data.domain.Page;
@@ -142,6 +143,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         BigDecimal getIncomeTotal();
 
     }
+
+    Long countAllByCategory(CategoryEntity category);
 
 
 }

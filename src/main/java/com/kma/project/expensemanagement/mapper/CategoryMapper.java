@@ -13,6 +13,8 @@ public interface CategoryMapper {
 
     CategoryEntity convertToEntity(CategoryInputDto dto);
 
+    CategoryEntity createNewEntity(CategoryEntity entity);
+
     CategoryOutputDto convertToDto(CategoryEntity entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

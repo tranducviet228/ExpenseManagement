@@ -212,7 +212,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     @Override
     public ExpenseIncomeSituationOutputDto expenseIncomeSituation(String type, Integer year, Integer toYear,
                                                                   List<Long> walletIds, String fromTime, String toTime) {
-
+        type = type == null ? EnumUtils.CURRENT : type;
         walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
         switch (type) {
             case EnumUtils.CURRENT:
@@ -335,6 +335,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
 
     public List<LocalDate> getPeriodTime(String time, String toTime, String timeType) {
+        timeType = timeType == null ? EnumUtils.DAY : timeType;
         List<LocalDate> dateList = new ArrayList<>();
         switch (timeType) {
             case EnumUtils.DAY:
@@ -395,6 +396,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     }
 
     public ExpenseIncomeSituationOutputDto getQuarterReport(List<Long> walletIds, Integer year) {
+        year = year == null ? LocalDate.now().getYear() : year;
         List<DataReportOutputDto> dataReports = new ArrayList<>();
 
         for (int i = 1; i <= 4; i++) {

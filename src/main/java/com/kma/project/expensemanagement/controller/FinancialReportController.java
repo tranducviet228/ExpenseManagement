@@ -34,7 +34,7 @@ public class FinancialReportController {
 //    }
 
     @ApiOperation("Tình hình thu chi")
-    @PutMapping("/report")
+    @PutMapping
     public ExpenseIncomeSituationOutputDto expenseIncomeSituation(@RequestBody ReportSituationInputDto inputDto,
                                                                   String type, Integer year, Integer toYear,
                                                                   String fromTime, String toTime) {

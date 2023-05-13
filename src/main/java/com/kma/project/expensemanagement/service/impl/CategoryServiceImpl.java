@@ -12,6 +12,8 @@ import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.CategoryMapper;
 import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
+import com.kma.project.expensemanagement.repository.RecurringTransactionRepository;
+import com.kma.project.expensemanagement.repository.TransactionRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.CategoryService;
 import com.kma.project.expensemanagement.service.UploadFileService;
@@ -38,6 +40,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     CategoryLogoRepository logoRepository;
+
+    @Autowired
+    TransactionRepository transactionRepository;
+
+    @Autowired
+    RecurringTransactionRepository recurringTransactionRepository;
 
     @Autowired
     CategoryMapper mapper;
@@ -83,6 +91,11 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Long id) {
         CategoryEntity categoryEntity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.category-not-found")).build());
+
+        if (transactionRepository.countAllByCategory(categoryEntity).compareTo(0L) > 0 ||
+                recurringTransactionRepository.countAllByCategory(categoryEntity).compareTo(0L) > 0) {
+            throw AppException.builder().errorCodes(Collections.singletonList("error.category-was-used")).build();
+        }
         repository.delete(categoryEntity);
     }
 
