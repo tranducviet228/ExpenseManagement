@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -20,7 +20,7 @@ public interface RecurringTransactionRepository extends JpaRepository<RecurringT
 
     @Query(value = " select r from RecurringTransactionEntity r" +
             " where (:date_time between r.fromDate and r.toDate) or (:date_time >= r.fromDate and r.toDate is null)")
-    List<RecurringTransactionEntity> getAllValidRecurring(@Param("date_time") LocalDateTime date_time);
+    List<RecurringTransactionEntity> getAllValidRecurring(@Param("date_time") LocalDate date_time);
 
     Long countAllByCategory(CategoryEntity category);
 

@@ -17,7 +17,6 @@ import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.RecurringTransactionService;
 import com.kma.project.expensemanagement.utils.DataUtils;
-import com.kma.project.expensemanagement.utils.EnumUtils;
 import com.kma.project.expensemanagement.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -143,22 +141,6 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
         Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
         categoryLogoEntity.ifPresent(logoEntity -> outputDto.setCategoryLogo(logoEntity.getFileUrl()));
-    }
-
-    public void jobAddTransaction() {
-        List<RecurringTransactionEntity> recurringTransactionEntities = recurringTransactionRepository.getAllValidRecurring(LocalDateTime.now());
-        recurringTransactionEntities.forEach(entity -> {
-            switch (entity.getFrequencyType().name()) {
-                case EnumUtils.HOURLY:
-
-                case EnumUtils.DAILY:
-                case EnumUtils.WEEKLY:
-                case EnumUtils.MONTHLY:
-                case EnumUtils.QUATERLY:
-                case EnumUtils.YEARLY:
-                case EnumUtils.WEEKDAY:
-            }
-        });
     }
 }
 

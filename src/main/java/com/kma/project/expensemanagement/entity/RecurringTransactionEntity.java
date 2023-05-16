@@ -25,7 +25,7 @@ public class RecurringTransactionEntity extends BaseEntity {
     @Column(name = "amount")
     private BigDecimal amount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
@@ -35,7 +35,7 @@ public class RecurringTransactionEntity extends BaseEntity {
     @Column(name = "arise_date")
     private LocalDateTime ariseDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id")
     private WalletEntity wallet;
 

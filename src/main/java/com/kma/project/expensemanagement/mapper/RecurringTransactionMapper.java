@@ -3,6 +3,7 @@ package com.kma.project.expensemanagement.mapper;
 import com.kma.project.expensemanagement.dto.request.RecurringTransactionInputDto;
 import com.kma.project.expensemanagement.dto.response.RecurringTransactionOutputDto;
 import com.kma.project.expensemanagement.entity.RecurringTransactionEntity;
+import com.kma.project.expensemanagement.entity.TransactionEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -17,4 +18,6 @@ public interface RecurringTransactionMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     RecurringTransactionEntity update(RecurringTransactionInputDto dto, @MappingTarget RecurringTransactionEntity entity);
+
+    TransactionEntity convertToTransaction(RecurringTransactionEntity recurringTransactionEntity);
 }
