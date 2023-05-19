@@ -1,6 +1,7 @@
 package com.kma.project.expensemanagement.service.impl;
 
 import com.kma.project.expensemanagement.dto.request.WalletInputDto;
+import com.kma.project.expensemanagement.dto.request.WalletTransferMoneyDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
@@ -90,5 +91,24 @@ public class WalletServiceImpl implements WalletService {
                 .moneyTotal(moneyTotal)
                 .walletList(listWalletOutput)
                 .build();
+    }
+
+    @Transactional
+    @Override
+    public void transferMoney(Long fromWalletId, WalletTransferMoneyDto walletTransferMoneyDto) {
+
+        List<WalletEntity> list = new ArrayList<>();
+        WalletEntity fromWalletEntity = repository.findById(fromWalletId)
+                .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.wallet-not-found")).build());
+        list.add(fromWalletEntity);
+
+        WalletEntity toWalletEntity = repository.findById(walletTransferMoneyDto.getToWalletId())
+                .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.wallet-not-found")).build());
+        list.add(toWalletEntity);
+
+        fromWalletEntity.setAccountBalance(fromWalletEntity.getAccountBalance().subtract(walletTransferMoneyDto.getAmount()));
+        toWalletEntity.setAccountBalance(toWalletEntity.getAccountBalance().add(walletTransferMoneyDto.getAmount()));
+
+        repository.saveAll(list);
     }
 }

@@ -1,6 +1,7 @@
 package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.request.WalletInputDto;
+import com.kma.project.expensemanagement.dto.request.WalletTransferMoneyDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
@@ -49,6 +50,11 @@ public class WalletController {
     @GetMapping
     public WalletInformationOutputDto getAll() {
         return walletService.getInfoAllWallet();
+    }
+
+    @PutMapping(value = "/transfer/{id}")
+    public void transferMoney(@PathVariable("id") Long id, @RequestBody WalletTransferMoneyDto inputDto) {
+        walletService.transferMoney(id, inputDto);
     }
 
 }
