@@ -72,8 +72,8 @@ public class TransactionController {
         return transactionService.getAllTransaction(page, size, sort, search);
     }
 
-    @GetMapping("export")
-    public ResponseEntity<Resource> exportData(String fromDate, String toDate, List<Long> walletIds) {
+    @PutMapping("export")
+    public ResponseEntity<Resource> exportData(String fromDate, String toDate, @RequestBody List<Long> walletIds) {
         ResourceDto resourceDTO = excelService.exportData(fromDate, toDate, walletIds);
 
         HttpHeaders httpHeaders = new HttpHeaders();
