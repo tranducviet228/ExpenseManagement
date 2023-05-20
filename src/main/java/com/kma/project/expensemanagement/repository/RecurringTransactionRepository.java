@@ -15,8 +15,17 @@ import java.util.List;
 @Repository
 public interface RecurringTransactionRepository extends JpaRepository<RecurringTransactionEntity, Long> {
 
-    Page<RecurringTransactionEntity> findAllByCreatedBy(Pageable pageable, Long createdById);
+    @Query(value = " select r from RecurringTransactionEntity r where" +
+            " r.createdBy = :createdById and r.toDate < :date ")
+    Page<RecurringTransactionEntity> findAllEndTransaction(Pageable pageable, Long createdById, LocalDate date);
 
+    @Query(value = " select r from RecurringTransactionEntity r where" +
+            " r.createdBy = :createdById and r.fromDate <= :date and (r.toDate >= :date or r.toDate is null) ")
+    Page<RecurringTransactionEntity> findAllStartTransaction(Pageable pageable, Long createdById, LocalDate date);
+
+    @Query(value = " select r from RecurringTransactionEntity r where" +
+            " r.createdBy = :createdById and r.fromDate > :date ")
+    Page<RecurringTransactionEntity> findAllNextTransaction(Pageable pageable, Long createdById, LocalDate date);
 
     @Query(value = " select r from RecurringTransactionEntity r" +
             " where (:date_time between r.fromDate and r.toDate) or (:date_time >= r.fromDate and r.toDate is null)")

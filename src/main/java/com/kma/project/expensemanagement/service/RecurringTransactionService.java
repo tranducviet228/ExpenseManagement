@@ -15,6 +15,7 @@ public interface RecurringTransactionService {
 
     DataResponse<RecurringTransactionOutputDto> getDetail(Long id);
 
-    PageResponse<RecurringTransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search);
+    PageResponse<RecurringTransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search,
+                                                                  String type);
 
 }

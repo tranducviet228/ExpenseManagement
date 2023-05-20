@@ -17,6 +17,7 @@ import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.RecurringTransactionService;
 import com.kma.project.expensemanagement.utils.DataUtils;
+import com.kma.project.expensemanagement.utils.EnumUtils;
 import com.kma.project.expensemanagement.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
@@ -124,10 +126,19 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     }
 
     @Override
-    public PageResponse<RecurringTransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search) {
+    public PageResponse<RecurringTransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort,
+                                                                         String search, String type) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
-        Page<RecurringTransactionEntity> listTransaction = recurringTransactionRepository
-                .findAllByCreatedBy(pageable, jwtUtils.getCurrentUserId());
+        Page<RecurringTransactionEntity> listTransaction = null;
+
+        if (EnumUtils.FINISHED.equals(type)) {
+            listTransaction = recurringTransactionRepository.findAllEndTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
+        } else if (EnumUtils.ON_GOING.equals(type)) {
+            listTransaction = recurringTransactionRepository.findAllStartTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
+        } else {
+            listTransaction = recurringTransactionRepository.findAllNextTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
+        }
+
         return PageUtils.formatPageResponse(listTransaction.map(entity -> {
             RecurringTransactionOutputDto outputDto = recurringTransactionMapper.convertToDto(entity);
             mapDataResponse(outputDto, entity);

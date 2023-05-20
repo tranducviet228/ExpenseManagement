@@ -31,4 +31,10 @@ public class EnumUtils {
 
     public static final String WEEKDAY = "WEEKDAY";
 
+    public static final String ON_GOING = "ON_GOING";
+
+    public static final String UP_COMING = "UP_COMING";
+
+    public static final String FINISHED = "FINISHED";
+
 }

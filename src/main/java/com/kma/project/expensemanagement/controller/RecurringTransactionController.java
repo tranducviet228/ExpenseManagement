@@ -47,8 +47,9 @@ public class RecurringTransactionController {
 
     @ApiOperation(value = "Lấy danh sách giao dịch định kì")
     @GetMapping
-    public PageResponse<RecurringTransactionOutputDto> getAll(Integer page, Integer size, String sort, String search) {
-        return transactionService.getAllTransaction(page, size, sort, search);
+    public PageResponse<RecurringTransactionOutputDto> getAll(Integer page, Integer size, String sort, String search,
+                                                              @RequestParam(required = true) String type) {
+        return transactionService.getAllTransaction(page, size, sort, search, type);
     }
 
 
