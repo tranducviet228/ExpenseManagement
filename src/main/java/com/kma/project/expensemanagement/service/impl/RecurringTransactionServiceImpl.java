@@ -157,13 +157,19 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     }
 
     public void mapDataResponse(RecurringTransactionOutputDto outputDto, RecurringTransactionEntity entity) {
-        outputDto.setCategoryName(entity.getCategory().getName());
-        outputDto.setWalletName(entity.getWallet().getName());
-        outputDto.setCategoryId(entity.getCategory().getId());
-        outputDto.setWalletId(entity.getWallet().getId());
+        if (entity.getCategory() != null) {
+            outputDto.setCategoryName(entity.getCategory().getName());
+            outputDto.setCategoryId(entity.getCategory().getId());
+            if (entity.getCategory().getLogoImageID() != null) {
+                Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
+                categoryLogoEntity.ifPresent(logoEntity -> outputDto.setCategoryLogo(logoEntity.getFileUrl()));
+            }
+        }
+        if (entity.getWallet() != null) {
+            outputDto.setWalletName(entity.getWallet().getName());
+            outputDto.setWalletId(entity.getWallet().getId());
+        }
 
-        Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
-        categoryLogoEntity.ifPresent(logoEntity -> outputDto.setCategoryLogo(logoEntity.getFileUrl()));
     }
 }
 
