@@ -8,6 +8,7 @@ import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.CategoryLogoEntity;
 import com.kma.project.expensemanagement.entity.RecurringTransactionEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
+import com.kma.project.expensemanagement.enums.TransactionType;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.RecurringTransactionMapper;
 import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
@@ -133,16 +134,19 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     @Override
     public PageResponse<RecurringTransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort,
-                                                                         String search, String type) {
+                                                                         String search, String type, String status) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         Page<RecurringTransactionEntity> listTransaction = null;
 
-        if (EnumUtils.FINISHED.equals(type)) {
-            listTransaction = recurringTransactionRepository.findAllEndTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
-        } else if (EnumUtils.ON_GOING.equals(type)) {
-            listTransaction = recurringTransactionRepository.findAllStartTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
+        if (EnumUtils.FINISHED.equals(status)) {
+            listTransaction = recurringTransactionRepository
+                    .findAllEndTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now(), TransactionType.valueOf(type));
+        } else if (EnumUtils.ON_GOING.equals(status)) {
+            listTransaction = recurringTransactionRepository
+                    .findAllStartTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now(), TransactionType.valueOf(type));
         } else {
-            listTransaction = recurringTransactionRepository.findAllNextTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
+            listTransaction = recurringTransactionRepository
+                    .findAllNextTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now(), TransactionType.valueOf(type));
         }
 
         return PageUtils.formatPageResponse(listTransaction.map(entity -> {

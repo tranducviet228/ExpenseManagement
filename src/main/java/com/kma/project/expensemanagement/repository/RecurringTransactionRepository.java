@@ -2,6 +2,7 @@ package com.kma.project.expensemanagement.repository;
 
 import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.RecurringTransactionEntity;
+import com.kma.project.expensemanagement.enums.TransactionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,16 +17,17 @@ import java.util.List;
 public interface RecurringTransactionRepository extends JpaRepository<RecurringTransactionEntity, Long> {
 
     @Query(value = " select r from RecurringTransactionEntity r where" +
-            " r.createdBy = :createdById and r.toDate < :date ")
-    Page<RecurringTransactionEntity> findAllEndTransaction(Pageable pageable, Long createdById, LocalDate date);
+            " r.createdBy = :createdById and r.toDate < :date and r.transactionType = :type ")
+    Page<RecurringTransactionEntity> findAllEndTransaction(Pageable pageable, Long createdById, LocalDate date, TransactionType type);
 
     @Query(value = " select r from RecurringTransactionEntity r where" +
-            " r.createdBy = :createdById and r.fromDate <= :date and (r.toDate >= :date or r.toDate is null) ")
-    Page<RecurringTransactionEntity> findAllStartTransaction(Pageable pageable, Long createdById, LocalDate date);
+            " r.createdBy = :createdById and r.fromDate <= :date and (r.toDate >= :date or r.toDate is null) " +
+            " and r.transactionType = :type ")
+    Page<RecurringTransactionEntity> findAllStartTransaction(Pageable pageable, Long createdById, LocalDate date, TransactionType type);
 
     @Query(value = " select r from RecurringTransactionEntity r where" +
-            " r.createdBy = :createdById and r.fromDate > :date ")
-    Page<RecurringTransactionEntity> findAllNextTransaction(Pageable pageable, Long createdById, LocalDate date);
+            " r.createdBy = :createdById and r.fromDate > :date and r.transactionType = :type ")
+    Page<RecurringTransactionEntity> findAllNextTransaction(Pageable pageable, Long createdById, LocalDate date, TransactionType type);
 
     @Query(value = " select r from RecurringTransactionEntity r" +
             " where (:date_time between r.fromDate and r.toDate) or (:date_time >= r.fromDate and r.toDate is null)")
