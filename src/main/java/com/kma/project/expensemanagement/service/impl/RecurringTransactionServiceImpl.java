@@ -75,7 +75,7 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
         entity.setCreatedBy(jwtUtils.getCurrentUserId());
         entity.setAriseDate(LocalDateTime.now());
         recurringTransactionRepository.save(entity);
-        return recurringTransactionMapper.convertToDto(entity);
+        return getResponse(entity);
     }
 
     @Transactional
@@ -102,7 +102,7 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
             throw AppException.builder().errorCodes(Collections.singletonList("error.time-is-not-valid")).build();
         }
         recurringTransactionRepository.save(entity);
-        return recurringTransactionMapper.convertToDto(entity);
+        return getResponse(entity);
     }
 
     @Transactional
@@ -123,6 +123,12 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
         RecurringTransactionOutputDto outputDto = recurringTransactionMapper.convertToDto(entity);
         mapDataResponse(outputDto, entity);
         return DataUtils.formatData(outputDto);
+    }
+
+    public RecurringTransactionOutputDto getResponse(RecurringTransactionEntity entity) {
+        RecurringTransactionOutputDto outputDto = recurringTransactionMapper.convertToDto(entity);
+        mapDataResponse(outputDto, entity);
+        return outputDto;
     }
 
     @Override
@@ -149,6 +155,8 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     public void mapDataResponse(RecurringTransactionOutputDto outputDto, RecurringTransactionEntity entity) {
         outputDto.setCategoryName(entity.getCategory().getName());
         outputDto.setWalletName(entity.getWallet().getName());
+        outputDto.setCategoryId(entity.getCategory().getId());
+        outputDto.setWalletId(entity.getWallet().getId());
 
         Optional<CategoryLogoEntity> categoryLogoEntity = categoryLogoRepository.findById(entity.getCategory().getLogoImageID());
         categoryLogoEntity.ifPresent(logoEntity -> outputDto.setCategoryLogo(logoEntity.getFileUrl()));
