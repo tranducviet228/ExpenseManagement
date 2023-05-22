@@ -28,7 +28,7 @@ public class RecurringTransactionController {
     }
 
     @ApiOperation(value = "Cập nhật giao dịch định kì")
-    @PostMapping(value = "/{id}")
+    @PutMapping(value = "/{id}")
     public RecurringTransactionOutputDto update(@PathVariable("id") Long id, @RequestBody RecurringTransactionInputDto inputDto) {
         return transactionService.update(id, inputDto);
     }
