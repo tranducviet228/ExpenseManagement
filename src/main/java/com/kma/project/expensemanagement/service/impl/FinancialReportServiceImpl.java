@@ -133,7 +133,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             dayReport.setAmountTotal(amountTotal);
             dayTransactionList.add(dayReport);
         });
-        return dayTransactionList;
+        return dayTransactionList.stream().sorted(Comparator.comparing(DayTransactionReportOutputDto::getDate).reversed()).collect(Collectors.toList());
     }
 
     // get all Transaction in fromDate to toDate

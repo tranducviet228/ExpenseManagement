@@ -35,9 +35,7 @@ public class RecurringTransactionJob {
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void createRecurringTransaction() {
-        System.out.println("hhihihih");
         List<RecurringTransactionEntity> recurringTransactionList = recurringTransactionRepository.getAllValidRecurring(LocalDate.now());
-        System.out.println("hehehhee");
         List<TransactionEntity> transactionEntityList = new ArrayList<>();
         for (RecurringTransactionEntity recurringTransactionEntity : recurringTransactionList) {
             TransactionEntity transactionEntity = null;

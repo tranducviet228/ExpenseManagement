@@ -42,8 +42,11 @@ public class ExcelServiceImpl implements ExcelService {
 
         walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
 
+//        List<TransactionEntity> tranList = transactionRepository
+//                .findAllTransactionByAriseDate(firstDate, lastDate, walletIds, jwtUtils.getCurrentUserId());
+
         List<TransactionEntity> tranList = transactionRepository
-                .findAllTransactionByAriseDate(firstDate, lastDate, walletIds, jwtUtils.getCurrentUserId());
+                .findAll();
         Resource resource = prepareExcel(tranList);
         return ResourceDto.builder().resource(resource).
                 mediaType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")).build();
