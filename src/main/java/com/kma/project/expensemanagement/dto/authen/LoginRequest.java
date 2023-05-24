@@ -14,4 +14,6 @@ public class LoginRequest {
 
     @NotBlank(message = "{error.password-not-null}")
     private String password;
+
+    private String deviceToken;
 }

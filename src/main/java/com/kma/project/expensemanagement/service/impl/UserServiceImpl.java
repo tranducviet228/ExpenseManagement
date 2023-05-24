@@ -4,16 +4,14 @@ import com.kma.project.expensemanagement.dto.authen.*;
 import com.kma.project.expensemanagement.dto.request.UserUpdateDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.UserOutputDto;
-import com.kma.project.expensemanagement.entity.CategoryEntity;
-import com.kma.project.expensemanagement.entity.RefreshToken;
-import com.kma.project.expensemanagement.entity.RoleEntity;
-import com.kma.project.expensemanagement.entity.UserEntity;
+import com.kma.project.expensemanagement.entity.*;
 import com.kma.project.expensemanagement.enums.ERole;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.exception.AppResponseDto;
 import com.kma.project.expensemanagement.mapper.CategoryMapper;
 import com.kma.project.expensemanagement.mapper.UserMapper;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
+import com.kma.project.expensemanagement.repository.DeviceTokenRepository;
 import com.kma.project.expensemanagement.repository.RoleRepository;
 import com.kma.project.expensemanagement.repository.UserRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
@@ -64,6 +62,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private DeviceTokenRepository deviceTokenRepository;
 
     @Value("${viet.app.jwtExpirationMs}")
     private int jwtExpirationMs;
@@ -176,6 +177,9 @@ public class UserServiceImpl implements UserService {
         Date expiredDate = new Date((new Date()).getTime() + jwtExpirationMs);
         LocalDateTime localDate = expiredDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
+        // register device token
+        registerDeviceToken(userDetails.getId(), loginRequest.getDeviceToken());
+
         JwtResponse jwtResponse = JwtResponse.builder()
                 .refreshToken(refreshToken.getToken())
                 .id(userDetails.getId())
@@ -186,6 +190,16 @@ public class UserServiceImpl implements UserService {
                 .expiredRefreshDate(refreshToken.getExpiryDate().toString())
                 .build();
         return AppResponseDto.builder().data(jwtResponse).httpStatus(200).message("Đăng nhập thành công").build();
+
+    }
+
+    private void registerDeviceToken(Long userId, String deviceToken) {
+        DeviceTokenEntity deviceTokenEntity = deviceTokenRepository.findFirstByUserId(userId)
+                .orElse(new DeviceTokenEntity());
+        deviceTokenEntity.setUserId(userId);
+        deviceTokenEntity.setToken(deviceToken);
+
+        deviceTokenRepository.save(deviceTokenEntity);
 
     }
 
