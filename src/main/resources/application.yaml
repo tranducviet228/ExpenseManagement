@@ -2,12 +2,9 @@ server:
   port: 8081
 spring:
   datasource:
-#    username: postgres
-    #    password: 11111111
-    #    url: jdbc:postgresql://localhost:5432/expense_management
-    username: mmtxkkre
-    password: 0uCdcveeXmzwNiex4d78VuYFqR9tXSwK
-    url: jdbc:postgresql://tiny.db.elephantsql.com/mmtxkkre
+    username: postgres
+    password: 123456
+    url: jdbc:postgresql://159.223.40.101:5432/expense_management
   jpa:
     show-sql: true
     open-in-view: true
@@ -44,9 +41,7 @@ email:
 
 
 app:
-  firebase-configuration-file: expense-app-4a943-firebase-adminsdk-n8rkm-e954bc1d1f.json
-  notifications:
-    defaults: { topic: 'common', title: 'Common topic - Hello', message: 'Sending test message \uD83D\uDE42', token: 'ss22t03wz208eg:APA2idkkow223FE_0v5yHxqCLTyxAQafj6nWaqi4QzwZTW004q1PUux63UsFN', payloadMessageId: '123', payloadData: 'Hello. This is payload content.' }
+  firebase-configuration-file: viet-wallet-firebase-adminsdk-rg002-bfb8704423.json
 
 
 

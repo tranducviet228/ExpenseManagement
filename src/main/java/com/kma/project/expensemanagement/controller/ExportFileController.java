@@ -21,8 +21,10 @@ public class ExportFileController {
     private ExcelService excelService;
 
     @GetMapping
-    public ResponseEntity<Resource> exportData(String fromDate, String toDate,
-                                               @RequestParam(required = false) List<Long> walletIds) {
+    public ResponseEntity<Resource> exportData(@RequestParam(required = true) String fromDate,
+                                               @RequestParam(required = false) String toDate,
+                                               @RequestParam(required = true) List<Long> walletIds) {
+
         ResourceDto resourceDTO = excelService.exportData(fromDate, toDate, walletIds);
 
         HttpHeaders httpHeaders = new HttpHeaders();

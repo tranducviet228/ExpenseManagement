@@ -86,7 +86,8 @@ public class FinancialReportServiceImpl implements FinancialReportService {
         LocalDateTime firstDate = firstDateInMonth.atTime(0, 0, 0);
         LocalDateTime lastDate = lastDateInMonth.atTime(23, 59, 59);
 
-        List<TransactionOutputDto> transactionOutputs = getAllTransaction(walletId, firstDate, lastDate);
+        List<TransactionOutputDto> transactionOutputs = getAllTransaction(walletId, firstDate, lastDate)
+                .stream().sorted(Comparator.comparing(TransactionOutputDto::getCreatedAt).reversed()).collect(Collectors.toList());
 
         Map<LocalDate, List<TransactionOutputDto>> map = new HashMap<>();
         BigDecimal expenseTotal = BigDecimal.ZERO;

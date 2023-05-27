@@ -3,7 +3,7 @@ package com.kma.project.expensemanagement.enums;
 public enum FrequencyType {
 
     DAILY,
-    WEEKLY,
+    WEEK,
     MONTHLY,
     QUARTERLY,
     YEARLY,

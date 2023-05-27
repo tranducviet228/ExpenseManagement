@@ -15,6 +15,7 @@ public interface ExpenseLimitRepository extends JpaRepository<ExpenseLimitEntity
 
     @Query(value = " select * from expense_limits where " +
             " (:categoryId = any(category_ids)) and (:walletId = any(wallet_ids)) " +
-            " and (from_date <= :date and (to_date >= :date or to_date is null) ) ", nativeQuery = true)
-    List<ExpenseLimitEntity> getValidExpenseLimit(String categoryId, String walletId, LocalDate date);
+            " and (from_date <= :date and (to_date >= :date or to_date is null) " +
+            " and created_by = :userId) ", nativeQuery = true)
+    List<ExpenseLimitEntity> getValidExpenseLimit(String categoryId, String walletId, LocalDate date, Long userId);
 }

@@ -88,7 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
         walletRepository.save(wallet);
 
         // update expense limit
-        expenseLimitService.updateToLimit(inputDto);
+        expenseLimitService.updateToLimit(entity);
         TransactionOutputDto transactionOutputDto = mapper.convertToDto(entity);
         mapDataResponse(transactionOutputDto, entity);
 

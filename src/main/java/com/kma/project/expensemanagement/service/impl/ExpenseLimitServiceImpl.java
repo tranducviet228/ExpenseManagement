@@ -1,20 +1,22 @@
 package com.kma.project.expensemanagement.service.impl;
 
 import com.kma.project.expensemanagement.dto.request.ExpenseLimitInputDto;
-import com.kma.project.expensemanagement.dto.request.TransactionInputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.ExpenseLimitOutputDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.ExpenseLimitEntity;
+import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.ExpenseLimitMapper;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
+import com.kma.project.expensemanagement.repository.DeviceTokenRepository;
 import com.kma.project.expensemanagement.repository.ExpenseLimitRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.ExpenseLimitService;
+import com.kma.project.expensemanagement.service.NotificationService;
 import com.kma.project.expensemanagement.utils.DataUtils;
 import com.kma.project.expensemanagement.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,22 +50,37 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    NotificationService notificationService;
+
+    @Autowired
+    DeviceTokenRepository deviceTokenRepository;
+
     @Transactional
     @Override
-    public void updateToLimit(TransactionInputDto inputDto) {
+    public void updateToLimit(TransactionEntity transactionEntity) {
         List<ExpenseLimitEntity> listLimit = repository
-                .getValidExpenseLimit(inputDto.getCategoryId().toString(), inputDto.getWalletId().toString(), LocalDate.now());
+                .getValidExpenseLimit(transactionEntity.getCategory().getId().toString(), transactionEntity.getWallet().getId().toString(),
+                        LocalDate.now(), transactionEntity.getCreatedBy());
+        System.out.println(LocalDate.now());
+        for (ExpenseLimitEntity expenseLimit : listLimit) {
+            expenseLimit.setActualAmount(expenseLimit.getActualAmount().add(transactionEntity.getAmount()));
 
-        for (ExpenseLimitEntity entity : listLimit) {
-            entity.setActualAmount(entity.getActualAmount().add(inputDto.getAmount()));
-            repository.save(entity);
-
-            if (entity.getActualAmount().compareTo(entity.getAmount()) > 0) {
+            if (expenseLimit.getActualAmount().compareTo(transactionEntity.getAmount()) > 0) {
                 // bắn noti lên app
+                String message = "Hạn mức :name đã bội chi :value";
+                message = message.replace(":name", expenseLimit.getLimitName());
+                BigDecimal value = expenseLimit.getActualAmount().subtract(transactionEntity.getAmount());
+                message = message.replace(":value", value.toString());
 
+                String finalMessage = message;
+                deviceTokenRepository.findFirstByUserId(transactionEntity.getCreatedBy()).ifPresent(deviceTokenEntity -> {
+                    String deviceToken = deviceTokenEntity.getToken();
+                    notificationService.sendNotification(deviceToken, "Viet Wallet", finalMessage);
+                });
             }
         }
-
+        repository.saveAll(listLimit);
 
     }
 

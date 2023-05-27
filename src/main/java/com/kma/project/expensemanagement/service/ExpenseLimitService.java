@@ -1,14 +1,14 @@
 package com.kma.project.expensemanagement.service;
 
 import com.kma.project.expensemanagement.dto.request.ExpenseLimitInputDto;
-import com.kma.project.expensemanagement.dto.request.TransactionInputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.ExpenseLimitOutputDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
+import com.kma.project.expensemanagement.entity.TransactionEntity;
 
 public interface ExpenseLimitService {
 
-    void updateToLimit(TransactionInputDto transactionInputDto);
+    void updateToLimit(TransactionEntity entity);
 
     ExpenseLimitOutputDto add(ExpenseLimitInputDto inputDto);
 
