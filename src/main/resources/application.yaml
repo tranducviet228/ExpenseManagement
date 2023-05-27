@@ -4,7 +4,9 @@ spring:
   datasource:
     username: postgres
     password: 123456
-    url: jdbc:postgresql://159.223.40.101:5432/expense_management
+    #    url: jdbc:postgresql://159.223.40.101:5432/expense_management
+    url: jdbc:postgresql://localhost:5432/expense_management
+
   jpa:
     show-sql: true
     open-in-view: true
