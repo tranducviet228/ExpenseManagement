@@ -30,24 +30,24 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 //    List<Map<String, BigDecimal>> findTransactionByDate(LocalDateTime fromDate, LocalDateTime toDate);
 
     @Query(value = " select t from TransactionEntity t where " +
-            " t.createdAt between :fromDate and :toDate and (t.wallet.id in :walletIds) and t.createdBy = :userId ")
+            " t.ariseDate between :fromDate and :toDate and (t.wallet.id in :walletIds) and t.createdBy = :userId ")
     List<TransactionEntity> findAllTransactionByWalletId(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
                                                          Long userId);
 
     @Query(value = " select t from TransactionEntity t where " +
-            " t.createdAt between :fromDate and :toDate and t.createdBy = :userId ")
+            " t.ariseDate between :fromDate and :toDate and t.createdBy = :userId ")
     List<TransactionEntity> findAllInMonth(LocalDateTime fromDate, LocalDateTime toDate, Long userId);
 
     @Query(value = " select sum(t.amount) from TransactionEntity t where " +
-            " t.createdAt between :fromDate and :toDate and t.transactionType = :tranType " +
+            " t.ariseDate between :fromDate and :toDate and t.transactionType = :tranType " +
             " and ( t.wallet.id in :walletIds ) and t.createdBy = :userId ")
     BigDecimal sumTotalByWalletIdAndTranType(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
                                              TransactionType tranType, Long userId);
 
-    @Query("SELECT MONTH(t.createdAt) AS name, SUM(CASE WHEN t.transactionType = 'EXPENSE' THEN t.amount ELSE 0 END) AS expenseTotal, "
+    @Query("SELECT MONTH(t.ariseDate) AS name, SUM(CASE WHEN t.transactionType = 'EXPENSE' THEN t.amount ELSE 0 END) AS expenseTotal, "
             + " SUM(CASE WHEN t.transactionType = 'INCOME' THEN t.amount ELSE 0 END) AS incomeTotal "
-            + " FROM TransactionEntity t where YEAR(t.createdAt) = :year and (t.wallet.id in :walletIds) "
-            + " AND t.createdBy = :userId GROUP BY MONTH(t.createdAt)")
+            + " FROM TransactionEntity t where YEAR(t.ariseDate) = :year and (t.wallet.id in :walletIds) "
+            + " AND t.createdBy = :userId GROUP BY MONTH(t.ariseDate)")
     List<ReportData> sumAmountByMonth(Integer year, List<Long> walletIds, Long userId);
 
 //    @Query("SELECT MONTH(t.createdAt) AS month, SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE 0 END) AS totalIncome,
@@ -60,16 +60,16 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             " join CategoryEntity c on t.category.id = c.id " +
             " join CategoryLogoEntity l on c.logoImageID = l.id " +
             " where t.transactionType = :transactionType and ( t.wallet.id in :walletIds) " +
-            " and t.createdAt between :fromDate and :toDate and t.createdBy = :userId " +
+            " and t.ariseDate between :fromDate and :toDate and t.createdBy = :userId " +
             " GROUP BY t.transactionType, c.name, l.fileUrl ")
     List<CategoryDetailReport> getCategoryDetail(TransactionType transactionType, List<Long> walletIds,
                                                  LocalDateTime fromDate, LocalDateTime toDate, Long userId);
 
-    @Query(value = " select sum(amount) as amount, DATE(created_at) as createdAt from transactions where " +
-            " (created_at between :fromDate and :toDate) and (transaction_type = :tranType) " +
+    @Query(value = " select sum(amount) as amount, DATE(arise_date) as createdAt from transactions where " +
+            " (arise_date between :fromDate and :toDate) and (transaction_type = :tranType) " +
             " and ( wallet_id in :walletIds) " +
             " and ( category_id in :categoryIds) and created_by = :userId " +
-            " group by DATE(created_at) ", nativeQuery = true)
+            " group by DATE(arise_date) ", nativeQuery = true)
     List<AnalysisDetail> getDayAnalysisDetail(
             @Param(value = "fromDate") LocalDateTime fromDate,
             @Param(value = "toDate") LocalDateTime toDate,
@@ -92,19 +92,19 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 //            @Param(value = "categoryIds") List<Long> categoryIds
 //    );
 
-    @Query(value = " select sum(t.amount) as amount, YEAR(t.createdAt) AS year, MONTH(t.createdAt) as month from TransactionEntity t where " +
-            " t.createdAt between :fromDate and :toDate and t.transactionType = :tranType " +
+    @Query(value = " select sum(t.amount) as amount, YEAR(t.ariseDate) AS year, MONTH(t.ariseDate) as month from TransactionEntity t where " +
+            " t.ariseDate between :fromDate and :toDate and t.transactionType = :tranType " +
             " and (t.wallet.id in :walletIds) " +
             " and (t.category.id in :categoryIds) and t.createdBy = :userId " +
-            " group by YEAR(t.createdAt), MONTH(t.createdAt) ")
+            " group by YEAR(t.ariseDate), MONTH(t.ariseDate) ")
     List<AnalysisMonthDetail> getMonthAnalysisDetail(LocalDateTime fromDate, LocalDateTime toDate, TransactionType tranType,
                                                      List<Long> walletIds, List<Long> categoryIds, Long userId);
 
-    @Query(value = " select sum(t.amount) as amount, YEAR(t.createdAt) as year from TransactionEntity t where " +
-            " t.createdAt between :fromDate and :toDate and t.transactionType = :tranType " +
+    @Query(value = " select sum(t.amount) as amount, YEAR(t.ariseDate) as year from TransactionEntity t where " +
+            " t.ariseDate between :fromDate and :toDate and t.transactionType = :tranType " +
             " and ( t.wallet.id in :walletIds) " +
             " and ( t.category.id in :categoryIds) and t.createdBy = :userId " +
-            " group by YEAR(t.createdAt) ")
+            " group by YEAR(t.ariseDate) ")
     List<AnalysisMonthDetail> getYearAnalysisDetail(LocalDateTime fromDate, LocalDateTime toDate, TransactionType tranType,
                                                     List<Long> walletIds, List<Long> categoryIds, Long userId);
 
