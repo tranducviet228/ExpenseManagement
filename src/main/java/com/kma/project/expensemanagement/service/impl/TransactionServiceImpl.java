@@ -76,7 +76,9 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.wallet-not-found")).build());
         entity.setWallet(wallet);
         entity.setCreatedBy(jwtUtils.getCurrentUserId());
-        entity.setAriseDate(LocalDateTime.now());
+        if (inputDto.getAriseDate() == null) {
+            entity.setAriseDate(LocalDateTime.now());
+        }
         repository.save(entity);
 
         // update wallet
