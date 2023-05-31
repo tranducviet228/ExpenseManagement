@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.security;
 
+import com.kma.project.expensemanagement.config.CorsFilter;
 import com.kma.project.expensemanagement.security.jwt.AuthEntryPointJwt;
 import com.kma.project.expensemanagement.security.jwt.AuthTokenFilter;
 import com.kma.project.expensemanagement.security.services.UserDetailsServiceImpl;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -78,6 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/test/**").permitAll()
                 .anyRequest().authenticated();
 
+        http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class);
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }
