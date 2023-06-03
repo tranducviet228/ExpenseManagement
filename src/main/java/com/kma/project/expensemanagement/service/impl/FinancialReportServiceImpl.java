@@ -334,6 +334,22 @@ public class FinancialReportServiceImpl implements FinancialReportService {
                 .categoryReports(categoryReports).build();
     }
 
+    @Override
+    public List<CategoryReportOutputDto> getCategoryReport(String type) {
+        BigDecimal total = transactionRepository.getTotal(jwtUtils.getCurrentUserId(), TransactionType.valueOf(type));
+        List<TransactionRepository.CategoryReport> map = transactionRepository
+                .getTotalTransactionByCategory(jwtUtils.getCurrentUserId(), TransactionType.valueOf(type));
+        List<CategoryReportOutputDto> list = new ArrayList<>();
+        map.forEach(categoryReport -> {
+            CategoryReportOutputDto categoryReportOutputDto = new CategoryReportOutputDto();
+            categoryReportOutputDto.setCategoryName(categoryReport.getCategoryName());
+            categoryReportOutputDto.setPercent((categoryReport.getAmount().divide(total, 4, RoundingMode.HALF_DOWN))
+                    .multiply(BigDecimal.valueOf(100)));
+            list.add(categoryReportOutputDto);
+        });
+        return list;
+    }
+
 
     public List<LocalDate> getPeriodTime(String time, String toTime, String timeType) {
         timeType = timeType == null ? EnumUtils.DAY : timeType;

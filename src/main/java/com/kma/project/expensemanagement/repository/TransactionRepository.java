@@ -146,5 +146,23 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
     Long countAllByCategory(CategoryEntity category);
 
+//    @Query(value = "select t.category.id, sum(t.amount) from TransactionEntity t join CategoryEntity c on t.category.id = c.id " +
+//            " where t.createdBy = :userId group by t.category.id ")
+//    List<Map<Long, BigDecimal>> getTotalTransactionByCategory(Long userId);
+
+    @Query(value = "select c.name as categoryName, sum(t.amount) as amount from TransactionEntity t join CategoryEntity c on t.category.id = c.id " +
+            " where t.createdBy = :userId and t.transactionType = :type group by t.category.id, c.name ")
+    List<CategoryReport> getTotalTransactionByCategory(Long userId, TransactionType type);
+
+    @Query(value = " select sum(t.amount) from TransactionEntity t where t.createdBy = :userId and t.transactionType = :type ")
+    BigDecimal getTotal(Long userId, TransactionType type);
+
+    interface CategoryReport {
+
+        String getCategoryName();
+
+        BigDecimal getAmount();
+
+    }
 
 }

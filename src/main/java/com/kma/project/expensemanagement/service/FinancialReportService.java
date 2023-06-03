@@ -1,9 +1,6 @@
 package com.kma.project.expensemanagement.service;
 
-import com.kma.project.expensemanagement.dto.response.report.DetailReportOutputDto;
-import com.kma.project.expensemanagement.dto.response.report.ExpenseIncomeSituationOutputDto;
-import com.kma.project.expensemanagement.dto.response.report.FinancialStatementOutputDto;
-import com.kma.project.expensemanagement.dto.response.report.ReportStatisticOutputDto;
+import com.kma.project.expensemanagement.dto.response.report.*;
 
 import java.util.List;
 
@@ -24,5 +21,7 @@ public interface FinancialReportService {
     // phân tích chi tiêu, thu
     ReportStatisticOutputDto expenseIncomeAnalysis(String type, String timeType, String fromTime, String toTime,
                                                    List<Long> categoryIds, List<Long> walletIds);
+
+    List<CategoryReportOutputDto> getCategoryReport(String type);
 
 }

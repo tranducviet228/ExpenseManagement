@@ -2,15 +2,14 @@ package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.request.ReportSituationInputDto;
 import com.kma.project.expensemanagement.dto.request.ReportStatisticInputDto;
-import com.kma.project.expensemanagement.dto.response.report.DetailReportOutputDto;
-import com.kma.project.expensemanagement.dto.response.report.ExpenseIncomeSituationOutputDto;
-import com.kma.project.expensemanagement.dto.response.report.FinancialStatementOutputDto;
-import com.kma.project.expensemanagement.dto.response.report.ReportStatisticOutputDto;
+import com.kma.project.expensemanagement.dto.response.report.*;
 import com.kma.project.expensemanagement.service.FinancialReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -53,6 +52,12 @@ public class FinancialReportController {
     public ReportStatisticOutputDto expenseAnalysis(@RequestBody ReportStatisticInputDto inputDto,
                                                     String type, String timeType, String fromTime, String toTime) {
         return financialReportService.expenseIncomeAnalysis(type, timeType, fromTime, toTime, inputDto.getCategoryIds(), inputDto.getWalletIds());
+    }
+
+    @ApiOperation("Tỉ lệ chi tiêu theo từng danh mục")
+    @GetMapping("/category-report")
+    public List<CategoryReportOutputDto> getCategoryReport(String type) {
+        return financialReportService.getCategoryReport(type);
     }
 
 
