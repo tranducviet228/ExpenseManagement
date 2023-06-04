@@ -9,6 +9,7 @@ import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.CategoryLogoEntity;
 import com.kma.project.expensemanagement.enums.CategoryType;
 import com.kma.project.expensemanagement.exception.AppException;
+import com.kma.project.expensemanagement.exception.AppResponseDto;
 import com.kma.project.expensemanagement.mapper.CategoryMapper;
 import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
@@ -88,15 +89,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     @Override
-    public void delete(Long id) {
+    public AppResponseDto<Object> delete(Long id) {
         CategoryEntity categoryEntity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.category-not-found")).build());
 
         if (transactionRepository.countAllByCategory(categoryEntity).compareTo(0L) > 0 ||
                 recurringTransactionRepository.countAllByCategory(categoryEntity).compareTo(0L) > 0) {
-            throw AppException.builder().errorCodes(Collections.singletonList("error.category-was-used")).build();
+//            throw AppException.builder().errorCodes(Collections.singletonList("error.category-was-used")).build();
+            return AppResponseDto.builder().httpStatus(200).message("Danh mục đã được sử dụng không được phép xóa").isDelete(false).build();
         }
         repository.delete(categoryEntity);
+        return AppResponseDto.builder().httpStatus(200).message("Xóa thành công").isDelete(true).build();
     }
 
     @Override

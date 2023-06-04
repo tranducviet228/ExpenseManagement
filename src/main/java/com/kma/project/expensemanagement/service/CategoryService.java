@@ -5,6 +5,7 @@ import com.kma.project.expensemanagement.dto.response.CategoryOutputDto;
 import com.kma.project.expensemanagement.dto.response.ContentResponse;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
+import com.kma.project.expensemanagement.exception.AppResponseDto;
 
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public interface CategoryService {
 
     CategoryOutputDto update(Long id, CategoryInputDto inputDto);
 
-    void delete(Long id);
+    AppResponseDto<Object> delete(Long id);
 
     DataResponse<CategoryOutputDto> getDetail(Long id);
 

@@ -19,6 +19,8 @@ public class AppResponseDto<T> {
     private List<AppExceptionError> errors;
     private T data;
     private String message;
+    private Boolean isDelete;
+
 
     public static AppResponseDto fromError(int httpStatus, AppException appException) {
         return AppResponseDto.builder()

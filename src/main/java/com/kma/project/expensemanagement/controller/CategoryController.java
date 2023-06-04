@@ -5,6 +5,7 @@ import com.kma.project.expensemanagement.dto.response.CategoryOutputDto;
 import com.kma.project.expensemanagement.dto.response.ContentResponse;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
+import com.kma.project.expensemanagement.exception.AppResponseDto;
 import com.kma.project.expensemanagement.service.CategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,8 +43,8 @@ public class CategoryController {
 
     @ApiOperation(value = "Xóa danh mục thu chi")
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id) {
-        categoryService.delete(id);
+    public AppResponseDto<Object> delete(@PathVariable("id") Long id) {
+        return categoryService.delete(id);
     }
 
     @ApiOperation(value = "Lấy danh sách danh mục thu chi")
