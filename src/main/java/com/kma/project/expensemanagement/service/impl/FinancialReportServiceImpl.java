@@ -298,7 +298,9 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             toDate = toDate.withDayOfMonth(toDate.toLocalDate().lengthOfMonth());
 
             List<TransactionRepository.AnalysisMonthDetail> monthDetail = transactionRepository
-                    .getMonthAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds, jwtUtils.getCurrentUserId());
+                    .getMonthAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds, jwtUtils.getCurrentUserId())
+                    .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisMonthDetail::getYear)
+                            .thenComparing(TransactionRepository.AnalysisMonthDetail::getMonth)).collect(Collectors.toList());
 
             for (TransactionRepository.AnalysisMonthDetail item : monthDetail) {
                 DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
@@ -309,7 +311,6 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             }
             if (!categoryReports.isEmpty()) {
                 mediumAmount = totalAmount.divide(BigDecimal.valueOf(categoryReports.size()), 0, RoundingMode.HALF_UP);
-                categoryReports.stream().sorted(Comparator.comparing(DetailReportStatisticOutputDto::getTime));
             }
         } else {
             // YEAR 2018-2023
@@ -318,7 +319,8 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             toDate = toDate.withDayOfMonth(toDate.toLocalDate().lengthOfMonth());
 
             List<TransactionRepository.AnalysisMonthDetail> yearDetail = transactionRepository
-                    .getYearAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds, jwtUtils.getCurrentUserId());
+                    .getYearAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds, jwtUtils.getCurrentUserId())
+                    .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisMonthDetail::getYear)).collect(Collectors.toList());
             for (TransactionRepository.AnalysisMonthDetail item : yearDetail) {
                 DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
                 detailReportStatistic.setTime(item.getYear().toString());
@@ -328,7 +330,6 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             }
             if (!categoryReports.isEmpty()) {
                 mediumAmount = totalAmount.divide(BigDecimal.valueOf(categoryReports.size()), 0, RoundingMode.HALF_UP);
-                categoryReports.stream().sorted(Comparator.comparing(DetailReportStatisticOutputDto::getTime));
             }
         }
 
