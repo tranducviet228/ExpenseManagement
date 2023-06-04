@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -31,6 +32,6 @@ public class TransactionInputDto {
 
 //    private MultipartFile imageFile;
 
-    private String ariseDate;
+    private LocalDateTime ariseDate;
 
 }
