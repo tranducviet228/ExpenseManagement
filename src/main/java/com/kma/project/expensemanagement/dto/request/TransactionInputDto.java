@@ -30,7 +30,7 @@ public class TransactionInputDto {
     @Pattern(regexp = "^(EXPENSE|INCOME)", message = "{error.transaction-type-not-valid}")
     private String transactionType;
 
-//    private MultipartFile imageFile;
+    private String imageUrl;
 
     private LocalDateTime ariseDate;
 
