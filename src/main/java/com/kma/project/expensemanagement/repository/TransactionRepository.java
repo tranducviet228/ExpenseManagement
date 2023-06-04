@@ -34,6 +34,12 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     List<TransactionEntity> findAllTransactionByWalletId(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
                                                          Long userId);
 
+    @Query(value = " select sum(amount) as amount, DATE(arise_date) as createdAt from transactions t where " +
+            " t.arise_date between :fromDate and :toDate and t.transaction_type = 'EXPENSE' " +
+            " and t.created_by = :userId group by DATE(arise_date)", nativeQuery = true)
+    List<AnalysisDetail> getTotalInWeek(LocalDateTime fromDate, LocalDateTime toDate, Long userId);
+
+
     @Query(value = " select t from TransactionEntity t where " +
             " t.ariseDate between :fromDate and :toDate and t.createdBy = :userId ")
     List<TransactionEntity> findAllInMonth(LocalDateTime fromDate, LocalDateTime toDate, Long userId);

@@ -350,6 +350,43 @@ public class FinancialReportServiceImpl implements FinancialReportService {
         return list;
     }
 
+    private static Map<String, String> createVietnameseDayOfWeekMap() {
+        Map<String, String> vietnameseDayOfWeekMap = new HashMap<>();
+        vietnameseDayOfWeekMap.put("MONDAY", "Thứ 2");
+        vietnameseDayOfWeekMap.put("TUESDAY", "Thứ 3");
+        vietnameseDayOfWeekMap.put("WEDNESDAY", "Thứ 4");
+        vietnameseDayOfWeekMap.put("THURSDAY", "Thứ 5");
+        vietnameseDayOfWeekMap.put("FRIDAY", "Thứ 6");
+        vietnameseDayOfWeekMap.put("SATURDAY", "Thứ 7");
+        vietnameseDayOfWeekMap.put("SUNDAY", "Chủ nhật");
+        return vietnameseDayOfWeekMap;
+    }
+
+    @Override
+    public WeekReportOutputDto getWeekExpenseReport() {
+        List<LocalDate> dateList = getWeekReport();
+        LocalDateTime firstDate = dateList.get(0).atTime(0, 0, 0);
+        LocalDateTime lastDate = dateList.get(dateList.size() - 1).atTime(23, 59, 59);
+        List<TransactionRepository.AnalysisDetail> totalInWeek = transactionRepository.
+                getTotalInWeek(firstDate, lastDate, jwtUtils.getCurrentUserId());
+
+        BigDecimal total = BigDecimal.ZERO;
+        List<DetailReportStatisticOutputDto> detailReport = new ArrayList<>();
+        Map<String, String> vietnameseDayOfWeekMap = createVietnameseDayOfWeekMap();
+
+        for (TransactionRepository.AnalysisDetail analysisDetail : totalInWeek) {
+            DetailReportStatisticOutputDto outputDto = new DetailReportStatisticOutputDto();
+
+            String englishDay = analysisDetail.getCreatedAt().getDayOfWeek().name();
+            outputDto.setTotalAmount(analysisDetail.getAmount());
+            outputDto.setTime(vietnameseDayOfWeekMap.get(englishDay));
+            detailReport.add(outputDto);
+
+            total = total.add(analysisDetail.getAmount());
+        }
+        return WeekReportOutputDto.builder().detailReport(detailReport).total(total).build();
+    }
+
 
     public List<LocalDate> getPeriodTime(String time, String toTime, String timeType) {
         timeType = timeType == null ? EnumUtils.DAY : timeType;

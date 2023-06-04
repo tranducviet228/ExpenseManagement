@@ -24,4 +24,6 @@ public interface FinancialReportService {
 
     List<CategoryReportOutputDto> getCategoryReport(String type);
 
+    WeekReportOutputDto getWeekExpenseReport();
+
 }

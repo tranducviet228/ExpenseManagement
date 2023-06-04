@@ -60,5 +60,9 @@ public class FinancialReportController {
         return financialReportService.getCategoryReport(type);
     }
 
-
+    @ApiOperation("Báo cáo chi tuần hiện tại")
+    @GetMapping("/week-report")
+    public WeekReportOutputDto getWeekReport() {
+        return financialReportService.getWeekExpenseReport();
+    }
 }
