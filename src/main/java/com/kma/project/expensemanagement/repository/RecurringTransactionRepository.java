@@ -33,6 +33,9 @@ public interface RecurringTransactionRepository extends JpaRepository<RecurringT
             " where (:date_time between r.fromDate and r.toDate) or (:date_time >= r.fromDate and r.toDate is null)")
     List<RecurringTransactionEntity> getAllValidRecurring(@Param("date_time") LocalDate date_time);
 
+
+    Page<RecurringTransactionEntity> getAllRecurringByCreatedByAndTransactionType(Pageable pageable, Long createdBy, TransactionType type);
+
     Long countAllByCategory(CategoryEntity category);
 
 

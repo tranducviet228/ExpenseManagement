@@ -136,20 +136,23 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     public PageResponse<RecurringTransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort,
                                                                          String search, String type, String status) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
-        Page<RecurringTransactionEntity> listTransaction = null;
+        Page<RecurringTransactionEntity> pageTransaction = null;
 
         if (EnumUtils.FINISHED.equals(status)) {
-            listTransaction = recurringTransactionRepository
+            pageTransaction = recurringTransactionRepository
                     .findAllEndTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now(), TransactionType.valueOf(type));
         } else if (EnumUtils.ON_GOING.equals(status)) {
-            listTransaction = recurringTransactionRepository
+            pageTransaction = recurringTransactionRepository
                     .findAllStartTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now(), TransactionType.valueOf(type));
-        } else {
-            listTransaction = recurringTransactionRepository
+        } else if (EnumUtils.UP_COMING.equals(status)) {
+            pageTransaction = recurringTransactionRepository
                     .findAllNextTransaction(pageable, jwtUtils.getCurrentUserId(), LocalDate.now(), TransactionType.valueOf(type));
+        } else {
+            pageTransaction = recurringTransactionRepository
+                    .getAllRecurringByCreatedByAndTransactionType(pageable, jwtUtils.getCurrentUserId(), TransactionType.valueOf(type));
         }
 
-        return PageUtils.formatPageResponse(listTransaction.map(entity -> {
+        return PageUtils.formatPageResponse(pageTransaction.map(entity -> {
             RecurringTransactionOutputDto outputDto = recurringTransactionMapper.convertToDto(entity);
             mapDataResponse(outputDto, entity);
             return outputDto;

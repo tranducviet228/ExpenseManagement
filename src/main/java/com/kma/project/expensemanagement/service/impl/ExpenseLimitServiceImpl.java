@@ -20,6 +20,7 @@ import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.ExpenseLimitService;
 import com.kma.project.expensemanagement.service.NotificationService;
 import com.kma.project.expensemanagement.utils.DataUtils;
+import com.kma.project.expensemanagement.utils.EnumUtils;
 import com.kma.project.expensemanagement.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -143,10 +144,23 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
     }
 
     @Override
-    public PageResponse<ExpenseLimitOutputDto> getAllExpenseLimit(Integer page, Integer size, String sort, String search) {
+    public PageResponse<ExpenseLimitOutputDto> getAllExpenseLimit(Integer page, Integer size, String sort, String search, String status) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         search = PageUtils.buildSearch(search);
-        Page<ExpenseLimitEntity> pageExpenseLimit = repository.getAllByCreatedByAndLimitNameLikeIgnoreCase(pageable, jwtUtils.getCurrentUserId(), search);
+
+        Page<ExpenseLimitEntity> pageExpenseLimit;
+        if (EnumUtils.FINISHED.equals(status)) {
+            pageExpenseLimit = repository
+                    .findAllEndLimit(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
+        } else if (EnumUtils.ON_GOING.equals(status)) {
+            pageExpenseLimit = repository
+                    .findAllStartLimit(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
+        } else if (EnumUtils.UP_COMING.equals(status)) {
+            pageExpenseLimit = repository
+                    .findAllNextLimit(pageable, jwtUtils.getCurrentUserId(), LocalDate.now());
+        } else {
+            pageExpenseLimit = repository.getAllByCreatedByAndLimitNameLikeIgnoreCase(pageable, jwtUtils.getCurrentUserId(), search);
+        }
 
         Set<Long> walletIds = new HashSet<>();
         pageExpenseLimit.forEach(entity -> {
