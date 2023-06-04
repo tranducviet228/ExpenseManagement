@@ -277,7 +277,8 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             fromDate = LocalDate.parse(fromTime).atTime(0, 0, 0);
             toDate = LocalDate.parse(toTime).atTime(23, 59, 59);
             List<TransactionRepository.AnalysisDetail> analysisDetail = transactionRepository
-                    .getDayAnalysisDetail(fromDate, toDate, type, walletIds, categoryIds, jwtUtils.getCurrentUserId());
+                    .getDayAnalysisDetail(fromDate, toDate, type, walletIds, categoryIds, jwtUtils.getCurrentUserId())
+                    .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisDetail::getCreatedAt)).collect(Collectors.toList());
             for (TransactionRepository.AnalysisDetail item : analysisDetail) {
                 DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
                 detailReportStatistic.setTime(item.getCreatedAt().toString());
