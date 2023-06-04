@@ -4,12 +4,14 @@ import com.kma.project.expensemanagement.dto.request.ExpenseLimitInputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.ExpenseLimitOutputDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
+import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
 import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.ExpenseLimitEntity;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.ExpenseLimitMapper;
+import com.kma.project.expensemanagement.mapper.WalletMapper;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
 import com.kma.project.expensemanagement.repository.DeviceTokenRepository;
 import com.kma.project.expensemanagement.repository.ExpenseLimitRepository;
@@ -28,8 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
@@ -46,6 +49,9 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
 
     @Autowired
     ExpenseLimitMapper mapper;
+
+    @Autowired
+    WalletMapper walletMapper;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -135,10 +141,28 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
     }
 
     @Override
-    public PageResponse<ExpenseLimitOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search) {
+    public PageResponse<ExpenseLimitOutputDto> getAllExpenseLimit(Integer page, Integer size, String sort, String search) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         search = PageUtils.buildSearch(search);
-        Page<ExpenseLimitEntity> pageUser = repository.getAllByCreatedByAndLimitNameLikeIgnoreCase(pageable, jwtUtils.getCurrentUserId(), search);
-        return PageUtils.formatPageResponse(pageUser.map(userEntity -> mapper.convertToOutputDto(userEntity)));
+        Page<ExpenseLimitEntity> pageExpenseLimit = repository.getAllByCreatedByAndLimitNameLikeIgnoreCase(pageable, jwtUtils.getCurrentUserId(), search);
+
+        Set<Long> walletIds = new HashSet<>();
+        pageExpenseLimit.forEach(entity -> {
+            walletIds.addAll(Arrays.stream(entity.getWalletIds()).map(Long::valueOf).collect(Collectors.toSet()));
+        });
+
+        Map<Long, WalletEntity> walletMap = walletRepository.findAllById(walletIds)
+                .stream().collect(Collectors.toMap(WalletEntity::getId, Function.identity()));
+        return PageUtils.formatPageResponse(pageExpenseLimit.map(userEntity ->
+                {
+                    ExpenseLimitOutputDto outputDto = mapper.convertToOutputDto(userEntity);
+                    List<WalletOutputDto> walletOutputs = new ArrayList<>();
+                    outputDto.getWalletIds().forEach(s -> {
+                        walletOutputs.add(walletMapper.convertToDto(walletMap.get(Long.valueOf(s))));
+                    });
+                    outputDto.setWalletOutputs(walletOutputs);
+                    return outputDto;
+                }
+        ));
     }
 }

@@ -25,6 +25,8 @@ public class ExpenseLimitOutputDto {
 
     private List<String> categoryIds;
 
+    private List<WalletOutputDto> walletOutputs;
+
     private List<String> walletIds;
 
     private LocalDate fromDate;

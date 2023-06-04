@@ -45,7 +45,7 @@ public class ExpenseLimitController {
     @ApiOperation(value = "Lấy danh sách hạn mức")
     @GetMapping
     public PageResponse<ExpenseLimitOutputDto> getAll(Integer page, Integer size, String sort, String search) {
-        return expenseLimitService.getAllTransaction(page, size, sort, search);
+        return expenseLimitService.getAllExpenseLimit(page, size, sort, search);
     }
 
 }

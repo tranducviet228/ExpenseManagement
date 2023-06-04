@@ -18,5 +18,5 @@ public interface ExpenseLimitService {
 
     DataResponse<ExpenseLimitOutputDto> getDetail(Long id);
 
-    PageResponse<ExpenseLimitOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search);
+    PageResponse<ExpenseLimitOutputDto> getAllExpenseLimit(Integer page, Integer size, String sort, String search);
 }
