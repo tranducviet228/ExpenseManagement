@@ -309,6 +309,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             }
             if (!categoryReports.isEmpty()) {
                 mediumAmount = totalAmount.divide(BigDecimal.valueOf(categoryReports.size()), 0, RoundingMode.HALF_UP);
+                categoryReports.stream().sorted(Comparator.comparing(DetailReportStatisticOutputDto::getTime));
             }
         } else {
             // YEAR 2018-2023
@@ -327,6 +328,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             }
             if (!categoryReports.isEmpty()) {
                 mediumAmount = totalAmount.divide(BigDecimal.valueOf(categoryReports.size()), 0, RoundingMode.HALF_UP);
+                categoryReports.stream().sorted(Comparator.comparing(DetailReportStatisticOutputDto::getTime));
             }
         }
 
