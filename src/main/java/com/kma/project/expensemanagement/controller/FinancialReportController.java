@@ -2,6 +2,7 @@ package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.request.ReportSituationInputDto;
 import com.kma.project.expensemanagement.dto.request.ReportStatisticInputDto;
+import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.report.*;
 import com.kma.project.expensemanagement.service.FinancialReportService;
 import io.swagger.annotations.Api;
@@ -56,13 +57,13 @@ public class FinancialReportController {
 
     @ApiOperation("Tỉ lệ chi tiêu theo từng danh mục")
     @GetMapping("/category-report")
-    public List<CategoryReportOutputDto> getCategoryReport(String type) {
+    public DataResponse<List<CategoryReportOutputDto>> getCategoryReport(String type) {
         return financialReportService.getCategoryReport(type);
     }
 
     @ApiOperation("Báo cáo chi tuần hiện tại")
     @GetMapping("/week-report")
-    public WeekReportOutputDto getWeekReport() {
+    public DataResponse<WeekReportOutputDto> getWeekReport() {
         return financialReportService.getWeekExpenseReport();
     }
 }

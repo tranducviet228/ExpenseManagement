@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.service.impl;
 
+import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.TransactionOutputDto;
 import com.kma.project.expensemanagement.dto.response.report.*;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
@@ -15,6 +16,7 @@ import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.FinancialReportService;
 import com.kma.project.expensemanagement.service.TransactionService;
 import com.kma.project.expensemanagement.service.WalletService;
+import com.kma.project.expensemanagement.utils.DataUtils;
 import com.kma.project.expensemanagement.utils.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -339,7 +341,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     }
 
     @Override
-    public List<CategoryReportOutputDto> getCategoryReport(String type) {
+    public DataResponse<List<CategoryReportOutputDto>> getCategoryReport(String type) {
         BigDecimal total = transactionRepository.getTotal(jwtUtils.getCurrentUserId(), TransactionType.valueOf(type));
         List<TransactionRepository.CategoryReport> map = transactionRepository
                 .getTotalTransactionByCategory(jwtUtils.getCurrentUserId(), TransactionType.valueOf(type));
@@ -351,7 +353,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
                     .multiply(BigDecimal.valueOf(100)));
             list.add(categoryReportOutputDto);
         });
-        return list;
+        return DataUtils.formatData(list);
     }
 
     private static Map<String, String> createVietnameseDayOfWeekMap() {
@@ -367,7 +369,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
     }
 
     @Override
-    public WeekReportOutputDto getWeekExpenseReport() {
+    public DataResponse<WeekReportOutputDto> getWeekExpenseReport() {
         List<LocalDate> dateList = getWeekReport();
         LocalDateTime firstDate = dateList.get(0).atTime(0, 0, 0);
         LocalDateTime lastDate = dateList.get(dateList.size() - 1).atTime(23, 59, 59);
@@ -388,7 +390,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
             total = total.add(analysisDetail.getAmount());
         }
-        return WeekReportOutputDto.builder().detailReport(detailReport).total(total).build();
+        return DataUtils.formatData(WeekReportOutputDto.builder().detailReport(detailReport).total(total).build());
     }
 
 
