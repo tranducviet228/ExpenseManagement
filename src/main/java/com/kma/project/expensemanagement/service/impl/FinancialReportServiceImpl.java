@@ -280,7 +280,8 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             toDate = LocalDate.parse(toTime).atTime(23, 59, 59);
             List<TransactionRepository.AnalysisDetail> analysisDetail = transactionRepository
                     .getDayAnalysisDetail(fromDate, toDate, type, walletIds, categoryIds, jwtUtils.getCurrentUserId())
-                    .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisDetail::getCreatedAt)).collect(Collectors.toList());
+                    .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisDetail::getCreatedAt))
+                    .collect(Collectors.toList());
             for (TransactionRepository.AnalysisDetail item : analysisDetail) {
                 DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
                 detailReportStatistic.setTime(item.getCreatedAt().toString());
@@ -302,8 +303,9 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
             List<TransactionRepository.AnalysisMonthDetail> monthDetail = transactionRepository
                     .getMonthAnalysisDetail(fromDate, toDate, Enum.valueOf(TransactionType.class, type), walletIds, categoryIds, jwtUtils.getCurrentUserId())
-                    .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisMonthDetail::getYear)
-                            .thenComparing(TransactionRepository.AnalysisMonthDetail::getMonth)).collect(Collectors.toList());
+                    .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisMonthDetail::getYear))
+//                            .thenComparing(TransactionRepository.AnalysisMonthDetail::getMonth))
+                    .collect(Collectors.toList());
 
             for (TransactionRepository.AnalysisMonthDetail item : monthDetail) {
                 DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
