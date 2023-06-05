@@ -77,7 +77,7 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
                 // bắn noti lên app
                 String message = "Hạn mức :name đã bội chi :value";
                 message = message.replace(":name", expenseLimit.getLimitName());
-                BigDecimal value = expenseLimit.getActualAmount().subtract(transactionEntity.getAmount());
+                BigDecimal value = expenseLimit.getActualAmount().subtract(expenseLimit.getAmount());
                 message = message.replace(":value", value.toString());
 
                 String finalMessage = message;
