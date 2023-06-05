@@ -178,7 +178,9 @@ public class UserServiceImpl implements UserService {
         LocalDateTime localDate = expiredDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
         // register device token
-        registerDeviceToken(userDetails.getId(), loginRequest.getDeviceToken());
+        if (loginRequest.getDeviceToken() != null) {
+            registerDeviceToken(userDetails.getId(), loginRequest.getDeviceToken());
+        }
 
         JwtResponse jwtResponse = JwtResponse.builder()
                 .refreshToken(refreshToken.getToken())
