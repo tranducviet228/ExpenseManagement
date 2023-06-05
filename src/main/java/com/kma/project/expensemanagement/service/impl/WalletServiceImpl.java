@@ -83,7 +83,7 @@ public class WalletServiceImpl implements WalletService {
     public WalletInformationOutputDto getInfoAllWallet() {
         BigDecimal moneyTotal = BigDecimal.ZERO;
         List<WalletOutputDto> listWalletOutput = new ArrayList<>();
-        for (WalletEntity item : repository.findAllByCreatedByAndOrderByCreatedAt(jwtUtils.getCurrentUserId())) {
+        for (WalletEntity item : repository.findAllByCreatedByOrderByCreatedAt(jwtUtils.getCurrentUserId())) {
             listWalletOutput.add(mapper.convertToDto(item));
             moneyTotal = moneyTotal.add(item.getAccountBalance());
         }
