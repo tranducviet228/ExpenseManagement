@@ -73,7 +73,7 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
         for (ExpenseLimitEntity expenseLimit : listLimit) {
             expenseLimit.setActualAmount(expenseLimit.getActualAmount().add(transactionEntity.getAmount()));
 
-            if (expenseLimit.getActualAmount().compareTo(transactionEntity.getAmount()) > 0) {
+            if (expenseLimit.getActualAmount().compareTo(expenseLimit.getAmount()) > 0) {
                 // bắn noti lên app
                 String message = "Hạn mức :name đã bội chi :value";
                 message = message.replace(":name", expenseLimit.getLimitName());
