@@ -47,13 +47,13 @@ public class ExcelServiceImpl implements ExcelService {
         LocalDateTime firstDate = fromDates.atTime(0, 0, 0);
         LocalDateTime lastDate = toDates.atTime(23, 59, 59);
 
-        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
-
-//        List<TransactionEntity> tranList = transactionRepository
-//                .findAllTransactionByAriseDate(firstDate, lastDate);
+//        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
 
         List<TransactionEntity> tranList = transactionRepository
-                .findAllTransactionByAriseDate(firstDate, lastDate, walletIds, jwtUtils.getCurrentUserId());
+                .findAllTransactionByAriseDate(firstDate, lastDate);
+
+//        List<TransactionEntity> tranList = transactionRepository
+//                .findAllTransactionByAriseDate(firstDate, lastDate, walletIds, jwtUtils.getCurrentUserId());
 
         List<TransactionExcelOutputDto> tranOutput = new ArrayList<>();
         tranList.forEach(transactionEntity -> {
