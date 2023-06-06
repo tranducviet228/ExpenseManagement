@@ -18,14 +18,14 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
 
-//    @Query(value = " select t from TransactionEntity t where " +
-//            " t.ariseDate between :fromDate and :toDate and (t.wallet.id in :walletIds) and t.createdBy = :userId ")
-//    List<TransactionEntity> findAllTransactionByAriseDate(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
-//                                                          Long userId);
-
     @Query(value = " select t from TransactionEntity t where " +
-            " t.ariseDate between :fromDate and :toDate")
-    List<TransactionEntity> findAllTransactionByAriseDate(LocalDateTime fromDate, LocalDateTime toDate);
+            " t.ariseDate between :fromDate and :toDate and (t.wallet.id in :walletIds) and t.createdBy = :userId order by t.ariseDate desc")
+    List<TransactionEntity> findAllTransactionByAriseDate(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
+                                                          Long userId);
+
+//    @Query(value = " select t from TransactionEntity t where " +
+//            " t.ariseDate between :fromDate and :toDate order by t.ariseDate ")
+//    List<TransactionEntity> findAllTransactionByAriseDate(LocalDateTime fromDate, LocalDateTime toDate);
 
     Page<TransactionEntity> findAllByCreatedBy(Pageable pageable, Long createdById);
 
