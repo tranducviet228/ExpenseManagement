@@ -72,6 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/actuator/**",
                         "/csrf",
                         "/oauth/**",
+                        "/api/v1/export/**",
                         "/api/auth/**")
                 .permitAll()
                 .antMatchers("/api/admin/**").access("hasRole('ROLE_ADMIN')")
