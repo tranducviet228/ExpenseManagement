@@ -152,7 +152,7 @@ public class ExcelServiceImpl implements ExcelService {
             populateCell(sheet, row, columnNo++, decimalFormat.format(tran.getAmount()), cellStyle);
             populateCell(sheet, row, columnNo++, "VND", cellStyle);
             populateCell(sheet, row, columnNo++, tran.getDescription(), cellStyle);
-            populateCell(sheet, row, columnNo++, tran.getTransactionType(), cellStyle);
+            populateCell(sheet, row, columnNo++, tran.getTransactionTypeName(), cellStyle);
             populateCell(sheet, row, columnNo++, tran.getDate().toString(), cellStyle);
             populateCell(sheet, row, columnNo++, formatter.format(tran.getTime()), cellStyle);
             populateCell(sheet, row, columnNo++, tran.getWalletName(), cellStyle);
