@@ -47,7 +47,7 @@ public class RecurringTransactionJob {
                 case EnumUtils.DAILY:
                     transactionEntity = createDailyTransaction(recurringTransactionEntity);
                     break;
-                case EnumUtils.WEEKLY:
+                case EnumUtils.WEEK:
                     transactionEntity = createWeeklyTransaction(recurringTransactionEntity);
                     break;
                 case EnumUtils.MONTHLY:
@@ -81,30 +81,20 @@ public class RecurringTransactionJob {
     }
 
     private TransactionEntity createMonthlyTransaction(RecurringTransactionEntity recurringTransactionEntity) {
-        // ngày đầu tiên của tháng sau
-        LocalDateTime nextMonthDate = recurringTransactionEntity.getAriseDate().plusMonths(1).withDayOfMonth(1);
-        try {
-            nextMonthDate = nextMonthDate.withDayOfMonth(recurringTransactionEntity.getAriseDate().getDayOfMonth());
-        } catch (DateTimeException dateTimeException) {
-            nextMonthDate = nextMonthDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
-        }
-        return checkDate(recurringTransactionEntity, nextMonthDate);
+        return checkDate(recurringTransactionEntity, EnumUtils.MONTHLY);
     }
 
     private TransactionEntity createYearlyTransaction(RecurringTransactionEntity recurringTransactionEntity) {
-        LocalDateTime nextYearDate = recurringTransactionEntity.getAriseDate().plusYears(1);
-        return checkDate(recurringTransactionEntity, nextYearDate);
+        return checkDate(recurringTransactionEntity, EnumUtils.YEARLY);
 
     }
 
     private TransactionEntity createQuarterlyTransaction(RecurringTransactionEntity recurringTransactionEntity) {
-        LocalDateTime nextQuarterDate = recurringTransactionEntity.getAriseDate().plusMonths(3);
-        return checkDate(recurringTransactionEntity, nextQuarterDate);
+        return checkDate(recurringTransactionEntity, EnumUtils.QUARTERLY);
     }
 
     private TransactionEntity createWeeklyTransaction(RecurringTransactionEntity recurringTransactionEntity) {
-        LocalDateTime nextWeekDate = recurringTransactionEntity.getAriseDate().plusDays(7);
-        return checkDate(recurringTransactionEntity, nextWeekDate);
+        return checkDate(recurringTransactionEntity, EnumUtils.WEEKLY);
 
     }
 
@@ -118,11 +108,34 @@ public class RecurringTransactionJob {
 
     }
 
-    public TransactionEntity checkDate(RecurringTransactionEntity recurringTransactionEntity, LocalDateTime nextDate) {
+    public TransactionEntity checkDate(RecurringTransactionEntity recurringTransactionEntity, String dateType) {
         if (LocalTime.now().withSecond(0).withNano(0).equals(recurringTransactionEntity.getTime().withSecond(0))
                 && recurringTransactionEntity.getAriseDate().toLocalDate().equals(LocalDate.now())) {
-            recurringTransactionEntity.setAriseDate(nextDate);
+
             createTransaction(recurringTransactionEntity);
+
+            LocalDateTime nextDate = null;
+            switch (dateType) {
+                case EnumUtils.MONTHLY:
+                    // ngày đầu tiên của tháng sau
+                    nextDate = recurringTransactionEntity.getAriseDate().plusMonths(1).withDayOfMonth(1);
+                    try {
+                        nextDate = nextDate.withDayOfMonth(recurringTransactionEntity.getAriseDate().getDayOfMonth());
+                    } catch (DateTimeException dateTimeException) {
+                        nextDate = nextDate.plusMonths(1).withDayOfMonth(1).minusDays(1);
+                    }
+                    break;
+                case EnumUtils.YEARLY:
+                    nextDate = recurringTransactionEntity.getAriseDate().plusYears(1);
+                    break;
+                case EnumUtils.QUARTERLY:
+                    nextDate = recurringTransactionEntity.getAriseDate().plusMonths(3);
+                    break;
+                case EnumUtils.WEEKLY:
+                    nextDate = recurringTransactionEntity.getAriseDate().plusDays(7);
+                    break;
+            }
+            recurringTransactionEntity.setAriseDate(nextDate);
         }
         return null;
     }
