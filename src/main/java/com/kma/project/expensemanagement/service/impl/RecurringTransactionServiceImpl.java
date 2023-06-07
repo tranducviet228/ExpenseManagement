@@ -104,6 +104,8 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
         } catch (DateTimeParseException e) {
             throw AppException.builder().errorCodes(Collections.singletonList("error.time-is-not-valid")).build();
         }
+        LocalDateTime localDateTime = LocalDateTime.of(inputDto.getFromDate(), LocalTime.parse(inputDto.getTime()));
+        entity.setAriseDate(localDateTime);
         recurringTransactionRepository.save(entity);
         return getResponse(entity);
     }
