@@ -109,10 +109,10 @@ public class RecurringTransactionJob {
     }
 
     public TransactionEntity checkDate(RecurringTransactionEntity recurringTransactionEntity, String dateType) {
-        if (LocalTime.now().withSecond(0).withNano(0).equals(recurringTransactionEntity.getTime().withSecond(0))
+        if (LocalTime.parse("11:15:44").withSecond(0).withNano(0).equals(recurringTransactionEntity.getTime().withSecond(0))
                 && recurringTransactionEntity.getAriseDate().toLocalDate().equals(LocalDate.now())) {
 
-            createTransaction(recurringTransactionEntity);
+            TransactionEntity transactionEntity = createTransaction(recurringTransactionEntity);
 
             LocalDateTime nextDate = null;
             switch (dateType) {
@@ -136,6 +136,7 @@ public class RecurringTransactionJob {
                     break;
             }
             recurringTransactionEntity.setAriseDate(nextDate);
+            return transactionEntity;
         }
         return null;
     }
