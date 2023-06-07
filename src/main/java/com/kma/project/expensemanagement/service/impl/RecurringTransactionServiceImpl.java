@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.Optional;
@@ -74,7 +75,8 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
         entity.setWallet(wallet);
 
         entity.setCreatedBy(jwtUtils.getCurrentUserId());
-        entity.setAriseDate(LocalDateTime.now());
+        LocalDateTime localDateTime = LocalDateTime.of(inputDto.getFromDate(), LocalTime.parse(inputDto.getTime()));
+        entity.setAriseDate(localDateTime);
         recurringTransactionRepository.save(entity);
         return getResponse(entity);
     }
