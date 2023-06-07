@@ -32,4 +32,7 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     List<CategoryEntity> getAllCategoryCreateByAdmin(@Param("role_name") String roleName);
 
     List<CategoryEntity> findAllByParentIdIn(@Param("parentIds") Collection<Long> parentIds);
+
+    List<CategoryEntity> findAllByParentId(@Param("parentId") Long parentId);
+
 }

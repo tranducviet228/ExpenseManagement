@@ -93,11 +93,18 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryEntity categoryEntity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.category-not-found")).build());
 
-        if (transactionRepository.countAllByCategory(categoryEntity).compareTo(0L) > 0 ||
-                recurringTransactionRepository.countAllByCategory(categoryEntity).compareTo(0L) > 0) {
-//            throw AppException.builder().errorCodes(Collections.singletonList("error.category-was-used")).build();
+        List<CategoryEntity> childCate = repository.findAllByParentId(id);
+        Set<Long> childCateIds = new HashSet<>();
+        for (CategoryEntity category : childCate) {
+            childCateIds.add(category.getId());
+        }
+        childCateIds.add(id);
+
+        if (transactionRepository.countAllByCategoryIn(childCateIds).compareTo(0L) > 0 ||
+                recurringTransactionRepository.countAllByCategoryIn(childCateIds).compareTo(0L) > 0) {
             return AppResponseDto.builder().httpStatus(200).message("Danh mục đã được sử dụng không được phép xóa").isDelete(false).build();
         }
+
         repository.delete(categoryEntity);
         return AppResponseDto.builder().httpStatus(200).message("Xóa thành công").isDelete(true).build();
     }

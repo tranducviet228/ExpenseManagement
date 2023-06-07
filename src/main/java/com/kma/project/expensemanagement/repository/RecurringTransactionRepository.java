@@ -1,6 +1,5 @@
 package com.kma.project.expensemanagement.repository;
 
-import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.RecurringTransactionEntity;
 import com.kma.project.expensemanagement.enums.TransactionType;
 import org.springframework.data.domain.Page;
@@ -11,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -36,7 +36,8 @@ public interface RecurringTransactionRepository extends JpaRepository<RecurringT
 
     Page<RecurringTransactionEntity> getAllRecurringByCreatedByAndTransactionType(Pageable pageable, Long createdBy, TransactionType type);
 
-    Long countAllByCategory(CategoryEntity category);
+    @Query(value = "select count(r) from RecurringTransactionEntity r where r.category.id in :categoryIds")
+    Long countAllByCategoryIn(@Param("categoryIds") Collection<Long> categoryIds);
 
 
 }

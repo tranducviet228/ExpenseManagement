@@ -1,6 +1,5 @@
 package com.kma.project.expensemanagement.repository;
 
-import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.enums.TransactionType;
 import org.springframework.data.domain.Page;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -154,7 +154,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
     }
 
-    Long countAllByCategory(CategoryEntity category);
+    @Query(value = " select count(t) from TransactionEntity t where t.category.id in :categoryIds")
+    Long countAllByCategoryIn(@Param("categoryIds") Collection<Long> categoryIds);
 
 //    @Query(value = "select t.category.id, sum(t.amount) from TransactionEntity t join CategoryEntity c on t.category.id = c.id " +
 //            " where t.createdBy = :userId group by t.category.id ")

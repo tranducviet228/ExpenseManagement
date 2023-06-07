@@ -8,6 +8,7 @@ import com.kma.project.expensemanagement.repository.TransactionRepository;
 import com.kma.project.expensemanagement.service.ExpenseLimitService;
 import com.kma.project.expensemanagement.utils.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class RecurringTransactionJob {
     @Autowired
     ExpenseLimitService expenseLimitService;
 
-//    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 60000)
     @Transactional
     public void createRecurringTransaction() {
         List<RecurringTransactionEntity> recurringTransactionList = recurringTransactionRepository.getAllValidRecurring(LocalDate.now());
