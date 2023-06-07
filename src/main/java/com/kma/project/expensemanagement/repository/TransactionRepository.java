@@ -78,7 +78,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     @Query(value = " select sum(amount) as amount, DATE(arise_date) as createdAt from transactions where " +
             " (arise_date between :fromDate and :toDate) and (transaction_type = :tranType) " +
             " and ( wallet_id in :walletIds) " +
-            " and ( category_id in :categoryIds) and created_by = :userId and t.add_to_report = false" +
+            " and ( category_id in :categoryIds) and created_by = :userId and add_to_report = false" +
             " group by DATE(arise_date) ", nativeQuery = true)
     List<AnalysisDetail> getDayAnalysisDetail(
             @Param(value = "fromDate") LocalDateTime fromDate,
