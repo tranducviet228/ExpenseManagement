@@ -120,7 +120,7 @@ public class RecurringTransactionJob {
 
     public TransactionEntity checkDate(RecurringTransactionEntity recurringTransactionEntity, LocalDateTime nextDate) {
         if (LocalTime.now().withSecond(0).withNano(0).equals(recurringTransactionEntity.getTime().withSecond(0))
-                && nextDate.toLocalDate().equals(LocalDate.now())) {
+                && recurringTransactionEntity.getAriseDate().toLocalDate().equals(LocalDate.now())) {
             recurringTransactionEntity.setAriseDate(nextDate);
             createTransaction(recurringTransactionEntity);
         }
