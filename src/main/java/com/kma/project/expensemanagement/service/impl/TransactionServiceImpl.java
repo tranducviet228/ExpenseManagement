@@ -143,7 +143,12 @@ public class TransactionServiceImpl implements TransactionService {
 
         // update wallet
         WalletEntity walletEntity = entity.getWallet();
-        walletEntity.setAccountBalance(walletEntity.getAccountBalance().add(entity.getAmount()));
+
+        if (EnumUtils.EXPENSE.equals(entity.getTransactionType().name())) {
+            walletEntity.setAccountBalance(walletEntity.getAccountBalance().add(entity.getAmount()));
+        } else {
+            walletEntity.setAccountBalance(walletEntity.getAccountBalance().subtract(entity.getAmount()));
+        }
         walletRepository.save(walletEntity);
 
     }
