@@ -5,7 +5,7 @@ spring:
     username: postgres
     password: 123456
     #    url: jdbc:postgresql://159.223.40.101:5432/expense_management
-    url: jdbc:postgresql://localhost:5432/expense_management
+    url: jdbc:postgresql://localhost:5432/nhung_wallet
 
   jpa:
     show-sql: true
@@ -43,7 +43,7 @@ email:
 
 
 app:
-  firebase-configuration-file: viet-wallet-firebase-adminsdk-rg002-bfb8704423.json
+  firebase-configuration-file: wallet-firebase-admin-sdk.json
 
 
 
