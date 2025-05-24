@@ -34,4 +34,6 @@ public class WalletOutputDto {
     private Long createdBy;
 
     private Long groupId;
+
+    private String groupName;
 }

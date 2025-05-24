@@ -6,12 +6,14 @@ import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
+import com.kma.project.expensemanagement.entity.GroupEntity;
 import com.kma.project.expensemanagement.entity.GroupMemberEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.enums.RoleOfGroup;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.WalletMapper;
 import com.kma.project.expensemanagement.repository.GroupMemberRepository;
+import com.kma.project.expensemanagement.repository.GroupRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.WalletService;
@@ -24,10 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -38,6 +38,9 @@ public class WalletServiceImpl implements WalletService {
 
     @Autowired
     GroupMemberRepository groupMemberRepository;
+
+    @Autowired
+    GroupRepository groupRepository;
 
     @Autowired
     WalletMapper mapper;
@@ -106,8 +109,16 @@ public class WalletServiceImpl implements WalletService {
     public WalletInformationOutputDto getInfoAllWallet(Long groupId) {
         BigDecimal moneyTotal = BigDecimal.ZERO;
         List<WalletOutputDto> listWalletOutput = new ArrayList<>();
-        for (WalletEntity item : repository.findAllByCreatedByOrGroupIdOrderByCreatedAt(jwtUtils.getCurrentUserId(), groupId)) {
-            listWalletOutput.add(mapper.convertToDto(item));
+        List<WalletEntity> wallets = repository.findAllByCreatedByOrGroupIdOrderByCreatedAt(jwtUtils.getCurrentUserId(), groupId);
+
+        Set<Long> groupIds = wallets.stream().map(WalletEntity::getGroupId)
+                .filter(Objects::nonNull).collect(Collectors.toSet());
+        List<GroupEntity> groupEntities = groupRepository.findAllByIdIn(groupIds);
+        Map<Long, String> groupMap = groupEntities.stream().collect(Collectors.toMap(GroupEntity::getId, GroupEntity::getName));
+        for (WalletEntity item : wallets) {
+            WalletOutputDto outputDto = mapper.convertToDto(item);
+            outputDto.setGroupName(groupMap.get(item.getGroupId()));
+            listWalletOutput.add(outputDto);
             moneyTotal = moneyTotal.add(item.getAccountBalance());
         }
         return WalletInformationOutputDto.builder()
