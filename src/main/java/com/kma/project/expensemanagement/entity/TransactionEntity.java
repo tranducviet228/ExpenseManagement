@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.entity;
 
+import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,4 +52,6 @@ public class TransactionEntity extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Enumerated(EnumType.STRING)
+    private ScopeType scopeType;
 }

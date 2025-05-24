@@ -3,6 +3,7 @@ package com.kma.project.expensemanagement.service.impl;
 import com.kma.project.expensemanagement.dto.response.ResourceDto;
 import com.kma.project.expensemanagement.dto.response.TransactionExcelOutputDto;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
+import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.enums.TransactionType;
 import com.kma.project.expensemanagement.repository.TransactionRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
@@ -39,7 +40,7 @@ public class ExcelServiceImpl implements ExcelService {
     private WalletRepository walletRepository;
 
     @Override
-    public ResourceDto exportData(String fromDate, String toDate, List<Long> walletIds) {
+    public ResourceDto exportData(String fromDate, String toDate, List<Long> walletIds, ScopeType scopeType) {
 
         LocalDate fromDates = fromDate == null ? LocalDate.now() : LocalDate.parse(fromDate);
         LocalDate toDates = toDate == null ? LocalDate.now() : LocalDate.parse(toDate);
@@ -47,13 +48,13 @@ public class ExcelServiceImpl implements ExcelService {
         LocalDateTime firstDate = fromDates.atTime(0, 0, 0);
         LocalDateTime lastDate = toDates.atTime(23, 59, 59);
 
-        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId()) : walletIds;
+        walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId(), scopeType) : walletIds;
 
 //        List<TransactionEntity> tranList = transactionRepository
 //                .findAllTransactionByAriseDate(firstDate, lastDate);
 
         List<TransactionEntity> tranList = transactionRepository
-                .findAllTransactionByAriseDate(firstDate, lastDate, walletIds, jwtUtils.getCurrentUserId());
+                .findAllTransactionByAriseDate(firstDate, lastDate, walletIds, jwtUtils.getCurrentUserId(), scopeType);
 
         List<TransactionExcelOutputDto> tranOutput = new ArrayList<>();
         tranList.forEach(transactionEntity -> {

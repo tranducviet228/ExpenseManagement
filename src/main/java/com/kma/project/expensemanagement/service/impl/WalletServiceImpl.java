@@ -7,6 +7,7 @@ import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
 import com.kma.project.expensemanagement.entity.WalletEntity;
+import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.WalletMapper;
 import com.kma.project.expensemanagement.repository.WalletRepository;
@@ -80,10 +81,10 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public WalletInformationOutputDto getInfoAllWallet() {
+    public WalletInformationOutputDto getInfoAllWallet(ScopeType scopeType) {
         BigDecimal moneyTotal = BigDecimal.ZERO;
         List<WalletOutputDto> listWalletOutput = new ArrayList<>();
-        for (WalletEntity item : repository.findAllByCreatedByOrderByCreatedAt(jwtUtils.getCurrentUserId())) {
+        for (WalletEntity item : repository.findAllByCreatedByAndScopeTypeOrderByCreatedAt(jwtUtils.getCurrentUserId(),scopeType)) {
             listWalletOutput.add(mapper.convertToDto(item));
             moneyTotal = moneyTotal.add(item.getAccountBalance());
         }

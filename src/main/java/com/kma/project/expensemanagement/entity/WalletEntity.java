@@ -1,10 +1,9 @@
 package com.kma.project.expensemanagement.entity;
 
+import com.kma.project.expensemanagement.enums.ScopeType;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
@@ -29,5 +28,8 @@ public class WalletEntity extends BaseEntity {
 
     @Column(name = "is_report")
     private boolean isReport;
+
+    @Enumerated(EnumType.STRING)
+    private ScopeType scopeType;
 
 }

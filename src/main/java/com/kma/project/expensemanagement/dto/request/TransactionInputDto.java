@@ -1,6 +1,7 @@
 package com.kma.project.expensemanagement.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kma.project.expensemanagement.enums.ScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,4 +35,5 @@ public class TransactionInputDto {
 
     private LocalDateTime ariseDate;
 
+    private ScopeType scopeType;
 }

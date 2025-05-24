@@ -5,6 +5,7 @@ import com.kma.project.expensemanagement.dto.request.WalletTransferMoneyDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
+import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.service.WalletService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,8 +49,8 @@ public class WalletController {
 
     @ApiOperation(value = "Lấy thông tin tất cả các ví")
     @GetMapping
-    public WalletInformationOutputDto getAll() {
-        return walletService.getInfoAllWallet();
+    public WalletInformationOutputDto getAll(ScopeType scopeType) {
+        return walletService.getInfoAllWallet(scopeType);
     }
 
     @PutMapping(value = "/transfer/{id}")

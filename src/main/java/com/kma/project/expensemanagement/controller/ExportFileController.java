@@ -1,6 +1,7 @@
 package com.kma.project.expensemanagement.controller;
 
 import com.kma.project.expensemanagement.dto.response.ResourceDto;
+import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.service.ExcelService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,10 @@ public class ExportFileController {
     @GetMapping
     public ResponseEntity<Resource> exportData(@RequestParam(required = true) String fromDate,
                                                @RequestParam(required = false) String toDate,
-                                               @RequestParam(required = true) List<Long> walletIds) {
+                                               @RequestParam(required = true) List<Long> walletIds,
+                                               @RequestParam(required = false)ScopeType scopeType) {
 
-        ResourceDto resourceDTO = excelService.exportData(fromDate, toDate, walletIds);
+        ResourceDto resourceDTO = excelService.exportData(fromDate, toDate, walletIds, scopeType);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Disposition",

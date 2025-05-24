@@ -4,6 +4,7 @@ import com.kma.project.expensemanagement.dto.request.ReportSituationInputDto;
 import com.kma.project.expensemanagement.dto.request.ReportStatisticInputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.report.*;
+import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.service.FinancialReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,8 +24,8 @@ public class FinancialReportController {
 
     @ApiOperation("Tài chính hiện tại")
     @GetMapping("/")
-    public FinancialStatementOutputDto getFinancialStatement(Long walletId, String fromDate, String toDate) {
-        return financialReportService.financialStatement(walletId, fromDate, toDate);
+    public FinancialStatementOutputDto getFinancialStatement(Long walletId, String fromDate, String toDate, ScopeType scopeType) {
+        return financialReportService.financialStatement(walletId, fromDate, toDate, scopeType);
     }
 
 //    @ApiOperation("Tình hình thu chi hiện tại")
@@ -37,33 +38,33 @@ public class FinancialReportController {
     @PutMapping
     public ExpenseIncomeSituationOutputDto expenseIncomeSituation(@RequestBody ReportSituationInputDto inputDto,
                                                                   String type, Integer year, Integer toYear,
-                                                                  String fromTime, String toTime) {
-        return financialReportService.expenseIncomeSituation(type, year, toYear, inputDto.getWalletIds(), fromTime, toTime);
+                                                                  String fromTime, String toTime, ScopeType scopeType) {
+        return financialReportService.expenseIncomeSituation(type, year, toYear, inputDto.getWalletIds(), fromTime, toTime, scopeType);
     }
 
     @ApiOperation("Chi tiết thu chi theo từng danh mục")
     @PutMapping("/detail-category")
     public DetailReportOutputDto getDetailReport(@RequestBody ReportSituationInputDto inputDto, String type, String time,
-                                                 String toTime, String timeType) {
-        return financialReportService.getDetailReport(type, time, toTime, timeType, inputDto.getWalletIds());
+                                                 String toTime, String timeType, ScopeType scopeType) {
+        return financialReportService.getDetailReport(type, time, toTime, timeType, inputDto.getWalletIds(), scopeType);
     }
 
     @ApiOperation("Phân tích chi tiêu và thu")
     @PutMapping("/statistic")
     public ReportStatisticOutputDto expenseAnalysis(@RequestBody ReportStatisticInputDto inputDto,
-                                                    String type, String timeType, String fromTime, String toTime) {
-        return financialReportService.expenseIncomeAnalysis(type, timeType, fromTime, toTime, inputDto.getCategoryIds(), inputDto.getWalletIds());
+                                                    String type, String timeType, String fromTime, String toTime, ScopeType scopeType) {
+        return financialReportService.expenseIncomeAnalysis(type, timeType, fromTime, toTime, inputDto.getCategoryIds(), inputDto.getWalletIds(), scopeType);
     }
 
     @ApiOperation("Tỉ lệ chi tiêu theo từng danh mục")
     @GetMapping("/category-report")
-    public DataResponse<List<CategoryReportOutputDto>> getCategoryReport(String type) {
-        return financialReportService.getCategoryReport(type);
+    public DataResponse<List<CategoryReportOutputDto>> getCategoryReport(String type, ScopeType scopeType) {
+        return financialReportService.getCategoryReport(type, scopeType);
     }
 
     @ApiOperation("Báo cáo chi tuần hiện tại")
     @GetMapping("/week-report")
-    public DataResponse<WeekReportOutputDto> getWeekReport() {
-        return financialReportService.getWeekExpenseReport();
+    public DataResponse<WeekReportOutputDto> getWeekReport(ScopeType scopeType) {
+        return financialReportService.getWeekExpenseReport(scopeType);
     }
 }

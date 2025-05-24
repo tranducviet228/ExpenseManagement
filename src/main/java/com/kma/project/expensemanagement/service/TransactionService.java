@@ -5,6 +5,7 @@ import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.TransactionOutputDto;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
+import com.kma.project.expensemanagement.enums.ScopeType;
 
 public interface TransactionService {
 
@@ -16,7 +17,7 @@ public interface TransactionService {
 
     DataResponse<TransactionOutputDto> getDetail(Long id);
 
-    PageResponse<TransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search);
+    PageResponse<TransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search, ScopeType scopeType);
 
     void mapDataResponse(TransactionOutputDto outputDto, TransactionEntity entity);
 

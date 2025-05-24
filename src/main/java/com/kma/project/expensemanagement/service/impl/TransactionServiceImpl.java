@@ -8,6 +8,7 @@ import com.kma.project.expensemanagement.entity.CategoryEntity;
 import com.kma.project.expensemanagement.entity.CategoryLogoEntity;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
+import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.TransactionMapper;
 import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
@@ -163,9 +164,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public PageResponse<TransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search) {
+    public PageResponse<TransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search, ScopeType scopeType) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
-        Page<TransactionEntity> listTransaction = repository.findAllByCreatedBy(pageable, jwtUtils.getCurrentUserId());
+        Page<TransactionEntity> listTransaction = repository.findAllByCreatedByAndScopeType(pageable, jwtUtils.getCurrentUserId(), scopeType);
         return PageUtils.formatPageResponse(listTransaction.map(entity -> {
             TransactionOutputDto outputDto = mapper.convertToDto(entity);
             mapDataResponse(outputDto, entity);

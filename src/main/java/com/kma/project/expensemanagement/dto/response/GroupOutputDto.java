@@ -1,37 +1,25 @@
 package com.kma.project.expensemanagement.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kma.project.expensemanagement.enums.ScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WalletOutputDto {
+public class GroupOutputDto {
 
     private Long id;
 
-    private BigDecimal accountBalance;
-
     private String name;
-
-    private String accountType;
-
-    private String currency;
 
     private String description;
 
-    private boolean isReport;
+    private List<GroupMemberOutputDto> groupMembers;
 
-    private LocalDateTime createdAt;
-
-    private Long createdBy;
-
-    private ScopeType scopeType;
 }

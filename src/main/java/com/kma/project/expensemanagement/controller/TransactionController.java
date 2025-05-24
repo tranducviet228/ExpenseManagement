@@ -4,6 +4,7 @@ import com.kma.project.expensemanagement.dto.request.TransactionInputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.TransactionOutputDto;
+import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.service.TransactionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -59,8 +60,8 @@ public class TransactionController {
 
     @ApiOperation(value = "Lấy danh sách giao dịch")
     @GetMapping
-    public PageResponse<TransactionOutputDto> getAll(Integer page, Integer size, String sort, String search) {
-        return transactionService.getAllTransaction(page, size, sort, search);
+    public PageResponse<TransactionOutputDto> getAll(Integer page, Integer size, String sort, String search, ScopeType scopeType) {
+        return transactionService.getAllTransaction(page, size, sort, search, scopeType);
     }
 
 }
