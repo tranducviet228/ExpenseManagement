@@ -9,23 +9,23 @@ import java.util.List;
 public interface FinancialReportService {
 
     // tài chính hiện tại
-    FinancialStatementOutputDto financialStatement(Long walletId, String fromDate, String toDate, ScopeType scopeType);
+    FinancialStatementOutputDto financialStatement(Long walletId, String fromDate, String toDate, Long groupId);
 
     // tình hình thu chi hiện tại
 //    CurrentSituationOutputDto currentExpenseIncomeSituation(Long walletId);
 
     // tình hình thu chi
     ExpenseIncomeSituationOutputDto expenseIncomeSituation(String type, Integer year, Integer toYear,
-                                                           List<Long> walletIds, String fromTime, String toTime, ScopeType scopeType);
+                                                           List<Long> walletIds, String fromTime, String toTime, Long groupId);
 
-    DetailReportOutputDto getDetailReport(String type, String time, String toTime, String timeType, List<Long> walletIds, ScopeType scopeType);
+    DetailReportOutputDto getDetailReport(String type, String time, String toTime, String timeType, List<Long> walletIds, Long groupId);
 
     // phân tích chi tiêu, thu
     ReportStatisticOutputDto expenseIncomeAnalysis(String type, String timeType, String fromTime, String toTime,
-                                                   List<Long> categoryIds, List<Long> walletIds, ScopeType scopeType);
+                                                   List<Long> categoryIds, List<Long> walletIds, Long groupId);
 
-    DataResponse<List<CategoryReportOutputDto>> getCategoryReport(String type, ScopeType scopeType);
+    DataResponse<List<CategoryReportOutputDto>> getCategoryReport(String type, Long groupId);
 
-    DataResponse<WeekReportOutputDto> getWeekExpenseReport(ScopeType scopeType);
+    DataResponse<WeekReportOutputDto> getWeekExpenseReport(Long groupId);
 
 }

@@ -36,4 +36,6 @@ public class TransactionInputDto {
     private LocalDateTime ariseDate;
 
     private ScopeType scopeType;
+
+    private Long groupId;
 }

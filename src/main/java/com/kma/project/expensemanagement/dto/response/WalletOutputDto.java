@@ -33,5 +33,5 @@ public class WalletOutputDto {
 
     private Long createdBy;
 
-    private ScopeType scopeType;
+    private Long groupId;
 }

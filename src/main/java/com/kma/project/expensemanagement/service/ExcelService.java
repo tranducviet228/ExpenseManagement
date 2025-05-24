@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ExcelService {
 
-    ResourceDto exportData(String fromDate, String toDate, List<Long> walletIds, ScopeType scopeType);
+    ResourceDto exportData(String fromDate, String toDate, List<Long> walletIds, Long groupId);
 
 }

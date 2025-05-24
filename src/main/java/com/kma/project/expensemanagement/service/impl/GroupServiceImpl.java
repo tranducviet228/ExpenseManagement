@@ -55,6 +55,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     @Override
     public GroupOutputDto add(GroupInputDto inputDto) {
+
         GroupEntity groupEntity = mapper.convertToEntity(inputDto);
         groupEntity.setCreatedBy(jwtUtils.getCurrentUserId());
         repository.save(groupEntity);
@@ -133,7 +134,12 @@ public class GroupServiceImpl implements GroupService {
     public PageResponse<GroupOutputDto> getAllGroup(Integer page, Integer size, String sort, String search) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         Page<GroupEntity> groupEntities = repository.findAllGroup(pageable, search, jwtUtils.getCurrentUserId());
-        return PageUtils.formatPageResponse(groupEntities.map(mapper::convertToDto));
+        return PageUtils.formatPageResponse(groupEntities.map(groupEntity -> {
+            GroupOutputDto response = mapper.convertToDto(groupEntity);
+            List<GroupMemberOutputDto> groupMembers = groupMemberRepository.findAllOutPutByGroupId(groupEntity.getId());
+            response.setGroupMembers(groupMembers);
+            return response;
+        }));
     }
 
 }

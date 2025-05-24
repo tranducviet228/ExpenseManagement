@@ -1,7 +1,6 @@
 package com.kma.project.expensemanagement.repository;
 
 import com.kma.project.expensemanagement.entity.TransactionEntity;
-import com.kma.project.expensemanagement.enums.ScopeType;
 import com.kma.project.expensemanagement.enums.TransactionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,58 +20,58 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
     @Query(value = " select t from TransactionEntity t where " +
             " t.ariseDate between :fromDate and :toDate and (t.wallet.id in :walletIds) and t.createdBy = :userId " +
-            " and t.scopeType = :scopeType order by t.ariseDate desc")
+            " and t.groupId = :groupId order by t.ariseDate desc")
     List<TransactionEntity> findAllTransactionByAriseDate(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
-                                                          Long userId, ScopeType scopeType);
+                                                          Long userId, Long groupId);
 
 //    @Query(value = " select t from TransactionEntity t where " +
 //            " t.ariseDate between :fromDate and :toDate order by t.ariseDate ")
 //    List<TransactionEntity> findAllTransactionByAriseDate(LocalDateTime fromDate, LocalDateTime toDate);
 
-    Page<TransactionEntity> findAllByCreatedByAndScopeType(Pageable pageable, Long createdById, ScopeType scopeType);
+    Page<TransactionEntity> findAllByCreatedByAndGroupId(Pageable pageable, Long createdById, Long groupId);
 
     @Query(value = " select t from TransactionEntity t where " +
             " t.ariseDate between :fromDate and :toDate and (t.wallet.id in :walletIds) and t.createdBy = :userId " +
-            " and t.scopeType = :scopeType")
+            " and t.groupId = :groupId")
     List<TransactionEntity> findAllTransactionByWalletId(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
-                                                         Long userId, ScopeType scopeType);
+                                                         Long userId, Long groupId);
 
     @Query(value = " select sum(amount) as amount, DATE(arise_date) as createdAt from transactions t where " +
             " t.arise_date between :fromDate and :toDate and t.transaction_type = 'EXPENSE' " +
-            " and t.created_by = :userId and t.scope_type = :scopeType group by DATE(arise_date)", nativeQuery = true)
-    List<AnalysisDetail> getTotalInWeek(LocalDateTime fromDate, LocalDateTime toDate, Long userId, ScopeType scopeType);
+            " and t.created_by = :userId and t.group_id = :groupId group by DATE(arise_date)", nativeQuery = true)
+    List<AnalysisDetail> getTotalInWeek(LocalDateTime fromDate, LocalDateTime toDate, Long userId, Long groupId);
 
 
     @Query(value = " select t from TransactionEntity t where " +
-            " t.ariseDate between :fromDate and :toDate and t.createdBy = :userId and t.scopeType = :scopeType")
-    List<TransactionEntity> findAllInMonth(LocalDateTime fromDate, LocalDateTime toDate, Long userId, ScopeType scopeType);
+            " t.ariseDate between :fromDate and :toDate and t.createdBy = :userId and t.groupId = :groupId")
+    List<TransactionEntity> findAllInMonth(LocalDateTime fromDate, LocalDateTime toDate, Long userId, Long groupId);
 
     @Query(value = " select sum(t.amount) from TransactionEntity t where " +
             " t.ariseDate between :fromDate and :toDate and t.transactionType = :tranType " +
-            " and ( t.wallet.id in :walletIds ) and t.createdBy = :userId and t.scopeType = :scopeType")
+            " and ( t.wallet.id in :walletIds ) and t.createdBy = :userId and t.groupId = :groupId")
     BigDecimal sumTotalByWalletIdAndTranType(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
-                                             TransactionType tranType, Long userId, ScopeType scopeType);
+                                             TransactionType tranType, Long userId, Long groupId);
 
     @Query("SELECT MONTH(t.ariseDate) AS name, SUM(CASE WHEN t.transactionType = 'EXPENSE' THEN t.amount ELSE 0 END) AS expenseTotal, "
             + " SUM(CASE WHEN t.transactionType = 'INCOME' THEN t.amount ELSE 0 END) AS incomeTotal "
             + " FROM TransactionEntity t where YEAR(t.ariseDate) = :year and (t.wallet.id in :walletIds) "
-            + " AND t.createdBy = :userId and t.scopeType = :scopeType GROUP BY MONTH(t.ariseDate)")
-    List<ReportData> sumAmountByMonth(Integer year, List<Long> walletIds, Long userId, ScopeType scopeType);
+            + " AND t.createdBy = :userId and t.groupId = :groupId GROUP BY MONTH(t.ariseDate)")
+    List<ReportData> sumAmountByMonth(Integer year, List<Long> walletIds, Long userId, Long groupId);
 
     @Query("SELECT SUM(t.amount) AS totalAmount, c.name as categoryName, l.fileUrl as categoryImage " +
             " FROM TransactionEntity t " +
             " join CategoryEntity c on t.category.id = c.id " +
             " join CategoryLogoEntity l on c.logoImageID = l.id " +
             " where t.transactionType = :transactionType and ( t.wallet.id in :walletIds) " +
-            " and t.ariseDate between :fromDate and :toDate and t.createdBy = :userId and t.scopeType = :scopeType " +
+            " and t.ariseDate between :fromDate and :toDate and t.createdBy = :userId and t.groupId = :groupId " +
             " GROUP BY t.transactionType, c.name, l.fileUrl ")
     List<CategoryDetailReport> getCategoryDetail(TransactionType transactionType, List<Long> walletIds,
-                                                 LocalDateTime fromDate, LocalDateTime toDate, Long userId, ScopeType scopeType);
+                                                 LocalDateTime fromDate, LocalDateTime toDate, Long userId, Long groupId);
 
     @Query(value = " select sum(amount) as amount, DATE(arise_date) as createdAt from transactions where " +
             " (arise_date between :fromDate and :toDate) and (transaction_type = :tranType) " +
             " and ( wallet_id in :walletIds) " +
-            " and ( category_id in :categoryIds) and created_by = :userId and scope_type = :scopeType "+
+            " and ( category_id in :categoryIds) and created_by = :userId and group_id = :groupId " +
             " group by DATE(arise_date) ", nativeQuery = true)
     List<AnalysisDetail> getDayAnalysisDetail(
             @Param(value = "fromDate") LocalDateTime fromDate,
@@ -81,25 +80,25 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param(value = "walletIds") List<Long> walletIds,
             @Param(value = "categoryIds") List<Long> categoryIds,
             @Param(value = "userId") Long userId,
-            @Param(value = "scopeType") ScopeType scopeType
+            @Param(value = "groupId") Long groupId
 
     );
 
     @Query(value = " select sum(t.amount) as amount, YEAR(t.ariseDate) AS year, MONTH(t.ariseDate) as month from TransactionEntity t where " +
             " t.ariseDate between :fromDate and :toDate and t.transactionType = :tranType " +
             " and (t.wallet.id in :walletIds) " +
-            " and (t.category.id in :categoryIds) and t.createdBy = :userId and t.scopeType = :scopeType" +
+            " and (t.category.id in :categoryIds) and t.createdBy = :userId and t.groupId = :groupId" +
             " group by YEAR(t.ariseDate), MONTH(t.ariseDate) ")
     List<AnalysisMonthDetail> getMonthAnalysisDetail(LocalDateTime fromDate, LocalDateTime toDate, TransactionType tranType,
-                                                     List<Long> walletIds, List<Long> categoryIds, Long userId, ScopeType scopeType);
+                                                     List<Long> walletIds, List<Long> categoryIds, Long userId, Long groupId);
 
     @Query(value = " select sum(t.amount) as amount, YEAR(t.ariseDate) as year from TransactionEntity t where " +
             " t.ariseDate between :fromDate and :toDate and t.transactionType = :tranType " +
             " and ( t.wallet.id in :walletIds) " +
-            " and ( t.category.id in :categoryIds) and t.createdBy = :userId and t.scopeType = :scopeType" +
+            " and ( t.category.id in :categoryIds) and t.createdBy = :userId and t.groupId = :groupId" +
             " group by YEAR(t.ariseDate) ")
     List<AnalysisMonthDetail> getYearAnalysisDetail(LocalDateTime fromDate, LocalDateTime toDate, TransactionType tranType,
-                                                    List<Long> walletIds, List<Long> categoryIds, Long userId, ScopeType scopeType);
+                                                    List<Long> walletIds, List<Long> categoryIds, Long userId, Long groupId);
 
     interface AnalysisMonthDetail {
         BigDecimal getAmount();
@@ -142,13 +141,13 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
 
     @Query(value = "select c.name as categoryName, sum(t.amount) as amount from TransactionEntity t join CategoryEntity c on t.category.id = c.id " +
-            " where t.createdBy = :userId and t.transactionType = :type and t.scopeType = :scopeType" +
+            " where t.createdBy = :userId and t.transactionType = :type and t.groupId = :groupId" +
             " group by t.category.id, c.name ")
-    List<CategoryReport> getTotalTransactionByCategory(Long userId, TransactionType type, ScopeType scopeType);
+    List<CategoryReport> getTotalTransactionByCategory(Long userId, TransactionType type, Long groupId);
 
     @Query(value = " select sum(t.amount) from TransactionEntity t where t.createdBy = :userId and t.transactionType = :type " +
-            "and t.scopeType = :scopeType")
-    BigDecimal getTotal(Long userId, TransactionType type, ScopeType scopeType);
+            "and t.groupId = :groupId")
+    BigDecimal getTotal(Long userId, TransactionType type, Long groupId);
 
     interface CategoryReport {
 

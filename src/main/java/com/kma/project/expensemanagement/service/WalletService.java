@@ -6,7 +6,6 @@ import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
-import com.kma.project.expensemanagement.enums.ScopeType;
 
 public interface WalletService {
 
@@ -20,7 +19,7 @@ public interface WalletService {
 
     PageResponse<WalletOutputDto> getAllWallet(Integer page, Integer size, String sort);
 
-    WalletInformationOutputDto getInfoAllWallet(ScopeType scopeType);
+    WalletInformationOutputDto getInfoAllWallet(Long groupId);
 
     void transferMoney(Long fromWalletId, WalletTransferMoneyDto walletTransferMoneyDto);
 }

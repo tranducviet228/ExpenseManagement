@@ -108,6 +108,9 @@ public class TransactionServiceImpl implements TransactionService {
 //            String fileUrl = uploadFileService.uploadFileCloud(inputDto.getImageFile());
 //            entity.setImageUrl(fileUrl);
 //        }
+        if(!entity.getCreatedBy().equals(jwtUtils.getCurrentUserId())){
+            throw AppException.builder().errorCodes(Collections.singletonList("error.user-not-permission")).build();
+        }
         if (inputDto.getCategoryId() != null) {
             CategoryEntity category = categoryRepository.findById(inputDto.getCategoryId())
                     .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.category-not-found")).build());
@@ -140,6 +143,11 @@ public class TransactionServiceImpl implements TransactionService {
     public void delete(Long id) {
         TransactionEntity entity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.transaction-not-found")).build());
+
+        if(!entity.getCreatedBy().equals(jwtUtils.getCurrentUserId())){
+            throw AppException.builder().errorCodes(Collections.singletonList("error.user-not-permission")).build();
+        }
+
         repository.delete(entity);
 
         // update wallet
@@ -164,9 +172,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public PageResponse<TransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search, ScopeType scopeType) {
+    public PageResponse<TransactionOutputDto> getAllTransaction(Integer page, Integer size, String sort, String search, Long groupId) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
-        Page<TransactionEntity> listTransaction = repository.findAllByCreatedByAndScopeType(pageable, jwtUtils.getCurrentUserId(), scopeType);
+        Page<TransactionEntity> listTransaction = repository.findAllByCreatedByAndGroupId(pageable, jwtUtils.getCurrentUserId(), groupId);
         return PageUtils.formatPageResponse(listTransaction.map(entity -> {
             TransactionOutputDto outputDto = mapper.convertToDto(entity);
             mapDataResponse(outputDto, entity);

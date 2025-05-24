@@ -54,4 +54,7 @@ public class TransactionEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ScopeType scopeType;
+
+    @Column(name = "group_id")
+    private Long groupId;
 }

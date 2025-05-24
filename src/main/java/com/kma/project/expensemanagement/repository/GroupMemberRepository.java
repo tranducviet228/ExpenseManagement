@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GroupMemberRepository extends JpaRepository<GroupMemberEntity, Long> {
@@ -18,4 +19,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMemberEntity, 
             "from GroupMemberEntity gm join UserEntity u on gm.userId = u.id " +
             "where gm.groupId = :groupId")
     List<GroupMemberOutputDto> findAllOutPutByGroupId(Long groupId);
+
+    Optional<GroupMemberEntity> findByGroupIdAndUserId(Long groupId, Long userId);
+
 }

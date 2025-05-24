@@ -60,8 +60,8 @@ public class TransactionController {
 
     @ApiOperation(value = "Lấy danh sách giao dịch")
     @GetMapping
-    public PageResponse<TransactionOutputDto> getAll(Integer page, Integer size, String sort, String search, ScopeType scopeType) {
-        return transactionService.getAllTransaction(page, size, sort, search, scopeType);
+    public PageResponse<TransactionOutputDto> getAll(Integer page, Integer size, String sort, String search, Long groupId) {
+        return transactionService.getAllTransaction(page, size, sort, search, groupId);
     }
 
 }

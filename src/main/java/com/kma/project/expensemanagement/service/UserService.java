@@ -18,7 +18,7 @@ public interface UserService {
 
     void changePassword(ChangePasswordRequestDto changePasswordRequestDto);
 
-    PageResponse<UserOutputDto> getAllUser(Integer page, Integer size, String sort, String search);
+    PageResponse<UserOutputDto> getAllUser(Integer page, Integer size, String sort, String search, Boolean isMobile);
 
     UserOutputDto updateUser(Long userId, UserUpdateDto dto);
 

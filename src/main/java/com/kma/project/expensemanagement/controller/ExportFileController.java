@@ -25,9 +25,9 @@ public class ExportFileController {
     public ResponseEntity<Resource> exportData(@RequestParam(required = true) String fromDate,
                                                @RequestParam(required = false) String toDate,
                                                @RequestParam(required = true) List<Long> walletIds,
-                                               @RequestParam(required = false)ScopeType scopeType) {
+                                               @RequestParam(required = false)Long groupId) {
 
-        ResourceDto resourceDTO = excelService.exportData(fromDate, toDate, walletIds, scopeType);
+        ResourceDto resourceDTO = excelService.exportData(fromDate, toDate, walletIds, groupId);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Disposition",

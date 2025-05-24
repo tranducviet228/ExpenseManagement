@@ -26,5 +26,5 @@ public class WalletInputDto {
 
     private boolean isReport;
 
-    private ScopeType scopeType;
+    private Long groupId;
 }

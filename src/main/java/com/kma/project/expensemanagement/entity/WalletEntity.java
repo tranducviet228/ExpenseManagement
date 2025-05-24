@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.entity;
 
+import com.kma.project.expensemanagement.enums.RoleOfGroup;
 import com.kma.project.expensemanagement.enums.ScopeType;
 import lombok.Data;
 
@@ -29,7 +30,9 @@ public class WalletEntity extends BaseEntity {
     @Column(name = "is_report")
     private boolean isReport;
 
+    @Column(name = "group_id")
+    private Long groupId;
+
     @Enumerated(EnumType.STRING)
     private ScopeType scopeType;
-
 }

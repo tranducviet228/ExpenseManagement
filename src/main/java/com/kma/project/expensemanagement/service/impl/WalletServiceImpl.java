@@ -6,10 +6,12 @@ import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto;
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
+import com.kma.project.expensemanagement.entity.GroupMemberEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
-import com.kma.project.expensemanagement.enums.ScopeType;
+import com.kma.project.expensemanagement.enums.RoleOfGroup;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.WalletMapper;
+import com.kma.project.expensemanagement.repository.GroupMemberRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.WalletService;
@@ -25,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,6 +35,9 @@ public class WalletServiceImpl implements WalletService {
 
     @Autowired
     WalletRepository repository;
+
+    @Autowired
+    GroupMemberRepository groupMemberRepository;
 
     @Autowired
     WalletMapper mapper;
@@ -42,6 +48,16 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     @Override
     public WalletOutputDto add(WalletInputDto inputDto) {
+
+        // check: if user is leader, this has permission to create wallet
+        if(inputDto.getGroupId() != null){
+            Optional<GroupMemberEntity> groupMemberEntity = groupMemberRepository
+                    .findByGroupIdAndUserId(inputDto.getGroupId(), jwtUtils.getCurrentUserId());
+            if(groupMemberEntity.isEmpty() || RoleOfGroup.MEMBER.equals(groupMemberEntity.get().getRoleOfGroup())){
+                throw AppException.builder().errorCodes(Collections.singletonList("error.user-not-permission")).build();
+            }
+        }
+
         WalletEntity walletEntity = mapper.convertToEntity(inputDto);
         walletEntity.setCreatedBy(jwtUtils.getCurrentUserId());
         repository.save(walletEntity);
@@ -53,6 +69,9 @@ public class WalletServiceImpl implements WalletService {
     public WalletOutputDto update(Long id, WalletInputDto inputDto) {
         WalletEntity walletEntity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.wallet-not-found")).build());
+        if(!walletEntity.getCreatedBy().equals(jwtUtils.getCurrentUserId())){
+            throw AppException.builder().errorCodes(Collections.singletonList("error.user-not-permission")).build();
+        }
         mapper.update(inputDto, walletEntity);
         repository.save(walletEntity);
         return mapper.convertToDto(walletEntity);
@@ -63,6 +82,9 @@ public class WalletServiceImpl implements WalletService {
     public void delete(Long id) {
         WalletEntity walletEntity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.wallet-not-found")).build());
+        if(!walletEntity.getCreatedBy().equals(jwtUtils.getCurrentUserId())){
+            throw AppException.builder().errorCodes(Collections.singletonList("error.user-not-permission")).build();
+        }
         repository.delete(walletEntity);
     }
 
@@ -81,10 +103,10 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public WalletInformationOutputDto getInfoAllWallet(ScopeType scopeType) {
+    public WalletInformationOutputDto getInfoAllWallet(Long groupId) {
         BigDecimal moneyTotal = BigDecimal.ZERO;
         List<WalletOutputDto> listWalletOutput = new ArrayList<>();
-        for (WalletEntity item : repository.findAllByCreatedByAndScopeTypeOrderByCreatedAt(jwtUtils.getCurrentUserId(),scopeType)) {
+        for (WalletEntity item : repository.findAllByCreatedByOrGroupIdOrderByCreatedAt(jwtUtils.getCurrentUserId(), groupId)) {
             listWalletOutput.add(mapper.convertToDto(item));
             moneyTotal = moneyTotal.add(item.getAccountBalance());
         }

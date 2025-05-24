@@ -29,8 +29,8 @@ public class UserController {
 
     @ApiOperation(value = "Lấy danh sách tài khoản")
     @GetMapping
-    public PageResponse<UserOutputDto> getAllUser(Integer page, Integer size, String sort, String search) {
-        return userService.getAllUser(page, size, sort, search);
+    public PageResponse<UserOutputDto> getAllUser(Integer page, Integer size, String sort, String search, Boolean isMobile) {
+        return userService.getAllUser(page, size, sort, search, isMobile);
     }
 
     @ApiOperation(value = "Cập nhật tài khoản")

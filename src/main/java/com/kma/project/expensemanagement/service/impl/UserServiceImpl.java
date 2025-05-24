@@ -1,5 +1,6 @@
 package com.kma.project.expensemanagement.service.impl;
 
+import com.google.api.client.util.SecurityUtils;
 import com.kma.project.expensemanagement.dto.authen.*;
 import com.kma.project.expensemanagement.dto.request.UserUpdateDto;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
@@ -22,6 +23,7 @@ import com.kma.project.expensemanagement.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -246,13 +248,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResponse<UserOutputDto> getAllUser(Integer page, Integer size, String sort, String search) {
+    public PageResponse<UserOutputDto> getAllUser(Integer page, Integer size, String sort, String search, Boolean isMobile) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         search = PageUtils.buildSearch(search);
+
         Page<UserEntity> pageUser = userRepository.findAllByEmailLikeIgnoreCaseOrUsernameLikeIgnoreCase(pageable, search, search);
-        return PageUtils.formatPageResponse(pageUser.map(userEntity -> {
-            return userMapper.convertToDto(userEntity);
-        }));
+
+        // Nếu là mobile thì lọc lại theo userId hiện tại
+        if (Boolean.TRUE.equals(isMobile)) {
+            Long currentUserId = jwtUtils.getCurrentUserId();
+
+            List<UserEntity> filtered = pageUser.getContent().stream()
+                    .filter(user -> !
+                            user.getId().equals(currentUserId))
+                    .collect(Collectors.toList());
+
+            pageUser = new PageImpl<>(filtered, pageable, filtered.size()); // giữ paging đúng
+        }
+
+        return PageUtils.formatPageResponse(pageUser.map(userMapper::convertToDto));
     }
 
     @Transactional
