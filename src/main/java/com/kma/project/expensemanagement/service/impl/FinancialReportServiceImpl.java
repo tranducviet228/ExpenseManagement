@@ -279,10 +279,18 @@ public class FinancialReportServiceImpl implements FinancialReportService {
         if (EnumUtils.DAY.equals(timeType)) {
             fromDate = LocalDate.parse(fromTime).atTime(0, 0, 0);
             toDate = LocalDate.parse(toTime).atTime(23, 59, 59);
-            List<TransactionRepository.AnalysisDetail> analysisDetail = transactionRepository
-                    .getDayAnalysisDetail(fromDate, toDate, type, walletIds, categoryIds, jwtUtils.getCurrentUserId(), groupId)
-                    .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisDetail::getCreatedAt))
-                    .collect(Collectors.toList());
+            List<TransactionRepository.AnalysisDetail> analysisDetail;
+            if(Objects.isNull(groupId)){
+                analysisDetail = transactionRepository
+                        .getDayAnalysisDetailWithoutGroupId(fromDate, toDate, type, walletIds, categoryIds, jwtUtils.getCurrentUserId())
+                        .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisDetail::getCreatedAt))
+                        .collect(Collectors.toList());
+            }else {
+                analysisDetail = transactionRepository
+                        .getDayAnalysisDetailWithGroupId(fromDate, toDate, type, walletIds, categoryIds, jwtUtils.getCurrentUserId(), groupId)
+                        .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisDetail::getCreatedAt))
+                        .collect(Collectors.toList());
+            }
             for (TransactionRepository.AnalysisDetail item : analysisDetail) {
                 DetailReportStatisticOutputDto detailReportStatistic = new DetailReportStatisticOutputDto();
                 detailReportStatistic.setTime(item.getCreatedAt().toString());
@@ -378,8 +386,14 @@ public class FinancialReportServiceImpl implements FinancialReportService {
         List<LocalDate> dateList = getWeekReport();
         LocalDateTime firstDate = dateList.get(0).atTime(0, 0, 0);
         LocalDateTime lastDate = dateList.get(dateList.size() - 1).atTime(23, 59, 59);
-        List<TransactionRepository.AnalysisDetail> totalInWeek = transactionRepository.
-                getTotalInWeek(firstDate, lastDate, jwtUtils.getCurrentUserId(), groupId);
+        List<TransactionRepository.AnalysisDetail> totalInWeek;
+        if(Objects.isNull(groupId)){
+            totalInWeek = transactionRepository.
+                    getTotalInWeekWithoutGroupId(firstDate, lastDate, jwtUtils.getCurrentUserId());
+        }else {
+            totalInWeek = transactionRepository.
+                    getTotalInWeekWithGroupId(firstDate, lastDate, jwtUtils.getCurrentUserId(), groupId);
+        }
 
         BigDecimal total = BigDecimal.ZERO;
         List<DetailReportStatisticOutputDto> detailReport = new ArrayList<>();
