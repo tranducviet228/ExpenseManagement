@@ -4,19 +4,15 @@ import com.kma.project.expensemanagement.dto.request.TransactionInputDto;
 import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.PageResponse;
 import com.kma.project.expensemanagement.dto.response.TransactionOutputDto;
-import com.kma.project.expensemanagement.entity.CategoryEntity;
-import com.kma.project.expensemanagement.entity.CategoryLogoEntity;
-import com.kma.project.expensemanagement.entity.TransactionEntity;
-import com.kma.project.expensemanagement.entity.WalletEntity;
+import com.kma.project.expensemanagement.entity.*;
 import com.kma.project.expensemanagement.enums.ScopeType;
+import com.kma.project.expensemanagement.enums.TransactionType;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.TransactionMapper;
-import com.kma.project.expensemanagement.repository.CategoryLogoRepository;
-import com.kma.project.expensemanagement.repository.CategoryRepository;
-import com.kma.project.expensemanagement.repository.TransactionRepository;
-import com.kma.project.expensemanagement.repository.WalletRepository;
+import com.kma.project.expensemanagement.repository.*;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.ExpenseLimitService;
+import com.kma.project.expensemanagement.service.NotificationService;
 import com.kma.project.expensemanagement.service.TransactionService;
 import com.kma.project.expensemanagement.service.UploadFileService;
 import com.kma.project.expensemanagement.utils.DataUtils;
@@ -25,12 +21,13 @@ import com.kma.project.expensemanagement.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @Service
@@ -55,10 +52,19 @@ public class TransactionServiceImpl implements TransactionService {
     CategoryLogoRepository categoryLogoRepository;
 
     @Autowired
+    GroupMemberRepository groupMemberRepository;
+
+    @Autowired
+    DeviceTokenRepository deviceTokenRepository;
+
+    @Autowired
     JwtUtils jwtUtils;
 
     @Autowired
     ExpenseLimitService expenseLimitService;
+
+    @Autowired
+    NotificationService notificationService;
 
     @Transactional
     @Override
@@ -82,6 +88,11 @@ public class TransactionServiceImpl implements TransactionService {
         }
         repository.save(entity);
 
+        // send noti to all member
+        if(Objects.nonNull(inputDto.getGroupId())){
+            sendNotiToAllMember(inputDto, category, wallet);
+        }
+
         // update wallet
         if (EnumUtils.EXPENSE.equals(entity.getTransactionType().name())) {
             wallet.setAccountBalance(wallet.getAccountBalance().subtract(entity.getAmount()));
@@ -96,6 +107,34 @@ public class TransactionServiceImpl implements TransactionService {
         mapDataResponse(transactionOutputDto, entity);
 
         return transactionOutputDto;
+    }
+
+    @Async
+    public void sendNotiToAllMember(TransactionInputDto inputDto, CategoryEntity category, WalletEntity wallet){
+        List<GroupMemberEntity> groupMemberEntities = groupMemberRepository.findAllByGroupId(inputDto.getGroupId());
+        Set<Long> memberIds = groupMemberEntities.stream().map(GroupMemberEntity::getUserId)
+                .filter(v -> !Objects.equals(v, jwtUtils.getCurrentUserId()))
+                .collect(Collectors.toSet());
+
+        List<DeviceTokenEntity> deviceTokenEntities = deviceTokenRepository.findAllByUserIdIn(memberIds);
+        List<String> tokens = deviceTokenEntities.stream().map(DeviceTokenEntity::getToken)
+                .collect(Collectors.toList());
+
+        String action = TransactionType.EXPENSE.name().equals(inputDto.getTransactionType()) ? "chi " : "thu";
+        String action2 = action.equals("chi ") ? "cho" : "từ";
+        String sb = "Thành viên " +
+                jwtUtils.getCurrentUserName() +
+                " vừa " +
+                action +
+                inputDto.getAmount() +
+                "(VND) " +
+                action2 +
+                " mục " +
+                "\"" + category.getName() + "\"" +
+                " - ví " +
+                "\"" + wallet.getName() + "\"";
+        notificationService.sendNotification(tokens, "Thông báo nhóm", sb
+        );
     }
 
     @Transactional

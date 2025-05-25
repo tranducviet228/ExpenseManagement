@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,16 +32,15 @@ public class NotificationServiceImpl implements NotificationService {
     @Value("${app.firebase-configuration-file}")
     private String firebaseConfigPath;
 
-    public void sendNotification(String deviceToken, String title, String message) {
+    public void sendNotification(List<String> deviceTokens, String title, String message) {
 
-        DeviceTokenEntity deviceTokenEntity = deviceTokenRepository.findFirstByToken(deviceToken)
-                .orElseThrow();
-
-        FirebaseMessaging.getInstance().sendAsync(
-                Message.builder()
+        List<DeviceTokenEntity> deviceTokenEntities = deviceTokenRepository.findAllByTokenIn(deviceTokens);
+        List<Message> messages = deviceTokenEntities.stream().map(deviceTokenEntity -> Message
+                        .builder()
                         .setToken(deviceTokenEntity.getToken())
-                        .setNotification(new Notification(title, message))
-                        .build());
+                        .setNotification(Notification.builder().setTitle(title).setBody(message).build())
+                        .build()).collect(Collectors.toList());
+        messages.forEach(mess -> FirebaseMessaging.getInstance().sendAsync(mess));
     }
 
     @PostConstruct

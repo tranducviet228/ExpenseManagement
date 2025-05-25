@@ -4,6 +4,8 @@ import com.kma.project.expensemanagement.entity.DeviceTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -13,4 +15,8 @@ public interface DeviceTokenRepository extends JpaRepository<DeviceTokenEntity, 
     Optional<DeviceTokenEntity> findFirstByUserId(Long userId);
 
     Optional<DeviceTokenEntity> findFirstByToken(String token);
+
+    List<DeviceTokenEntity> findAllByTokenIn(Collection<String> tokens);
+
+    List<DeviceTokenEntity> findAllByUserIdIn(Collection<Long> userIds);
 }

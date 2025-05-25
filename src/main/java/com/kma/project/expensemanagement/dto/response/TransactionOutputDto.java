@@ -45,5 +45,10 @@ public class TransactionOutputDto {
 
     private Long createdBy;
 
+    private String username;
+
     private ScopeType scopeType;
+
+    private Long groupId;
+
 }

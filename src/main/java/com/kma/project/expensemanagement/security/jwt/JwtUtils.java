@@ -74,6 +74,10 @@ public class JwtUtils {
 
     }
 
+    public String getCurrentUserName() {
+        return String.valueOf(getUserNameFromJwtToken(bearerTokenInterceptor.getBearerToken()));
+    }
+
     public Long getCurrentUserId() {
         return Long.valueOf(getUserIdFromJwtToken(bearerTokenInterceptor.getBearerToken()));
     }

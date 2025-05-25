@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RequestMapping("/api/v1/notifications")
 @RestController
 public class NotificationController {
@@ -21,7 +23,7 @@ public class NotificationController {
         String title = request.getTitle();
         String message = request.getMessage();
 
-        notificationService.sendNotification(deviceToken, title, message);
+        notificationService.sendNotification(List.of(deviceToken), title, message);
     }
 
 }

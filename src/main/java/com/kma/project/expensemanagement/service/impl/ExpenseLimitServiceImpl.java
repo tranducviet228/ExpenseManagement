@@ -84,7 +84,7 @@ public class ExpenseLimitServiceImpl implements ExpenseLimitService {
                 deviceTokenRepository.findFirstByUserId(transactionEntity.getCreatedBy()).ifPresent(deviceTokenEntity -> {
                     String deviceToken = deviceTokenEntity.getToken();
                     if (deviceToken != null) {
-                        notificationService.sendNotification(deviceToken, "Viet Wallet", finalMessage);
+                        notificationService.sendNotification(List.of(deviceToken), "Viet Wallet", finalMessage);
                     }
                 });
             }

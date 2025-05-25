@@ -4,6 +4,7 @@ import com.kma.project.expensemanagement.dto.response.DataResponse;
 import com.kma.project.expensemanagement.dto.response.TransactionOutputDto;
 import com.kma.project.expensemanagement.dto.response.report.*;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
+import com.kma.project.expensemanagement.entity.UserEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.enums.CategoryType;
 import com.kma.project.expensemanagement.enums.TransactionType;
@@ -11,6 +12,7 @@ import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.TransactionMapper;
 import com.kma.project.expensemanagement.repository.CategoryRepository;
 import com.kma.project.expensemanagement.repository.TransactionRepository;
+import com.kma.project.expensemanagement.repository.UserRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.FinancialReportService;
@@ -42,6 +44,9 @@ public class FinancialReportServiceImpl implements FinancialReportService {
 
     @Autowired
     WalletRepository walletRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     WalletService walletService;
@@ -153,8 +158,13 @@ public class FinancialReportServiceImpl implements FinancialReportService {
             // get all transaction in all wallet
             transactionEntityList = transactionRepository.findAllInMonth(firstDate, lastDate, jwtUtils.getCurrentUserId(), groupId);
         }
+        // get info users
+        Set<Long> userIds = transactionEntityList.stream().map(TransactionEntity::getCreatedBy).collect(Collectors.toSet());
+        Map<Long, String> usernameMap = userRepository.findAllByIdIn(userIds)
+                .stream().collect(Collectors.toMap(UserEntity::getId, UserEntity::getUsername));
         transactionOutputs = transactionEntityList.stream().map(entity -> {
             TransactionOutputDto outputDto = transactionMapper.convertToDto(entity);
+            outputDto.setUsername(usernameMap.get(entity.getCreatedBy()));
             transactionService.mapDataResponse(outputDto, entity);
             return outputDto;
         }).collect(Collectors.toList());
