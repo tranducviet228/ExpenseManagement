@@ -22,7 +22,7 @@ import java.util.Random;
 @Transactional(readOnly = true)
 public class MailServiceImpl implements MailService {
 
-    String subject = "[Công ty cổ phần Đức Việt]";
+    String subject = "[Mã OTP khôi phục tài khoản]";
 
     @Value("${email.fromEmail}")
     private String fromEmail;
@@ -37,7 +37,6 @@ public class MailServiceImpl implements MailService {
             "\n" +
             "Mã này sẽ hết hạn sau 5 phút, vui lòng không tiết lộ mã xác nhận của bạn cho bất kỳ ai.\n" +
             "\n" +
-            "Cảm ơn bạn đã sử dụng sản phẩm của CUDAU.\n" +
             "Trân trọng.";
     @Autowired
     private UserRepository userRepository;
