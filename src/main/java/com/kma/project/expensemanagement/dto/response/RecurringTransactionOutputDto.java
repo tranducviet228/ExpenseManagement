@@ -48,4 +48,5 @@ public class RecurringTransactionOutputDto {
 
     private List<String> dayInWeeks;
 
+    private Long groupId;
 }

@@ -62,4 +62,6 @@ public class RecurringTransactionEntity extends BaseEntity {
     @Type(type = "string-array")
     private String[] dayInWeeks;
 
+    private Long groupId;
+
 }

@@ -2,9 +2,11 @@ package com.kma.project.expensemanagement.job;
 
 import com.kma.project.expensemanagement.entity.RecurringTransactionEntity;
 import com.kma.project.expensemanagement.entity.TransactionEntity;
+import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.mapper.RecurringTransactionMapper;
 import com.kma.project.expensemanagement.repository.RecurringTransactionRepository;
 import com.kma.project.expensemanagement.repository.TransactionRepository;
+import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.service.ExpenseLimitService;
 import com.kma.project.expensemanagement.utils.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class RecurringTransactionJob {
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    WalletRepository walletRepository;
 
     @Autowired
     RecurringTransactionMapper recurringTransactionMapper;
@@ -67,6 +72,14 @@ public class RecurringTransactionJob {
                 transactionEntityList.add(transactionEntity);
                 // update expense limit
                 expenseLimitService.updateToLimit(transactionEntity);
+                // update to wallet balance
+                WalletEntity wallet = transactionEntity.getWallet();
+                if (EnumUtils.EXPENSE.equals(transactionEntity.getTransactionType().name())) {
+                    wallet.setAccountBalance(wallet.getAccountBalance().subtract(transactionEntity.getAmount()));
+                } else {
+                    wallet.setAccountBalance(wallet.getAccountBalance().add(transactionEntity.getAmount()));
+                }
+                walletRepository.save(wallet);
             }
         }
         transactionRepository.saveAll(transactionEntityList);

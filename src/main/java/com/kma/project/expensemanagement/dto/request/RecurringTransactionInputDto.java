@@ -41,4 +41,5 @@ public class RecurringTransactionInputDto {
 
     private List<String> dayInWeeks;
 
+    private Long groupId;
 }
