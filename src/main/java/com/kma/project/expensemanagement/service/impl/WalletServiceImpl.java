@@ -109,7 +109,12 @@ public class WalletServiceImpl implements WalletService {
     public WalletInformationOutputDto getInfoAllWallet(Long groupId) {
         BigDecimal moneyTotal = BigDecimal.ZERO;
         List<WalletOutputDto> listWalletOutput = new ArrayList<>();
-        List<WalletEntity> wallets = repository.findAllByCreatedByOrGroupIdOrderByCreatedAt(jwtUtils.getCurrentUserId(), groupId);
+        List<WalletEntity> wallets;
+        if(Objects.nonNull(groupId)){
+            wallets = repository.findAllByGroupIdOrderByCreatedAt(groupId);
+        }else {
+            wallets = repository.findAllWallet(jwtUtils.getCurrentUserId());
+        }
 
         Set<Long> groupIds = wallets.stream().map(WalletEntity::getGroupId)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
