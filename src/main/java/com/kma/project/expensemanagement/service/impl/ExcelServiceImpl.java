@@ -75,9 +75,9 @@ public class ExcelServiceImpl implements ExcelService {
 
     public String convertTransactionType(TransactionType transactionType) {
         if (transactionType.name().equals(EnumUtils.EXPENSE)) {
-            return "Thu";
-        } else {
             return "Chi";
+        } else {
+            return "Thu";
         }
     }
 
