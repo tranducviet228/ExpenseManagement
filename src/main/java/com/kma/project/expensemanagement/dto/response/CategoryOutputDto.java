@@ -36,4 +36,6 @@ public class CategoryOutputDto {
 
     private Long createdBy;
 
+    private Long groupId;
+
 }

@@ -1,6 +1,7 @@
 package com.kma.project.expensemanagement.repository;
 
 import com.kma.project.expensemanagement.entity.CategoryEntity;
+import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.enums.CategoryType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +16,30 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-    Page<CategoryEntity> findAllByNameLikeIgnoreCaseAndParentIdAndCreatedBy(Pageable pageable, String search, Long parentId,
-                                                                            Long createdBy);
+    @Query("SELECT w FROM CategoryEntity w " +
+            "LEFT JOIN GroupEntity g ON w.groupId = g.id " +
+            "WHERE " +
+            "(:parentId IS NULL OR w.parentId = :parentId) AND " +
+            "(:search IS NULL OR LOWER(w.name) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "((:groupId IS NOT NULL AND w.groupId = :groupId) OR " +
+            "(:groupId IS NULL AND (w.createdBy = :createdBy OR w.groupId IS NOT NULL))) " +
+            "ORDER BY w.createdAt")
+    Page<CategoryEntity> findAllCombined(@Param("pageable") Pageable pageable,
+                                         @Param("search") String search,
+                                         @Param("parentId") Long parentId,
+                                         @Param("createdBy") Long createdBy,
+                                         @Param("groupId") Long groupId);
 
-    List<CategoryEntity> findAllByNameLikeIgnoreCaseAndCreatedByAndCategoryType(String search, Long createdBy, CategoryType type);
+    @Query("SELECT w FROM CategoryEntity w " +
+            "WHERE " +
+            "(:type IS NULL OR w.categoryType = :type) AND " +
+            "(:search IS NULL OR LOWER(w.name) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "((:groupId IS NOT NULL AND w.groupId = :groupId) OR " +
+            "(:groupId IS NULL AND (w.createdBy = :createdBy OR w.groupId IS NOT NULL)))")
+    List<CategoryEntity> findAllFiltered(@Param("search") String search,
+                                         @Param("createdBy") Long createdBy,
+                                         @Param("type") CategoryType type,
+                                         @Param("groupId") Long groupId);
 
     @Query(value = " select c.id from CategoryEntity c where c.categoryType = :categoryType and c.createdBy = :userId ")
     List<Long> getAllCategoryId(@Param("categoryType") CategoryType categoryType,

@@ -121,11 +121,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public PageResponse<CategoryOutputDto> getAllCategoryByParentId(Integer page, Integer size, String sort, String search, Long parentId) {
+    public PageResponse<CategoryOutputDto> getAllCategoryByParentId(Integer page, Integer size, String sort, String search,
+                                                                    Long parentId, Long groupId) {
         Pageable pageable = PageUtils.customPageable(page, size, sort);
         parentId = parentId == null ? 0 : parentId;
         Page<CategoryEntity> categoryPage = repository
-                .findAllByNameLikeIgnoreCaseAndParentIdAndCreatedBy(pageable, PageUtils.buildSearch(search), parentId, jwtUtils.getCurrentUserId());
+                .findAllCombined(pageable, PageUtils.buildSearch(search), parentId, jwtUtils.getCurrentUserId(), groupId);
 
         List<Long> logoIds = new ArrayList<>();
         categoryPage.forEach(categoryEntity -> logoIds.add(categoryEntity.getLogoImageID()));
@@ -142,9 +143,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ContentResponse<Set<CategoryOutputDto>> getAllCategory(String search, String type) {
-        List<CategoryOutputDto> categoryOutputs = repository.findAllByNameLikeIgnoreCaseAndCreatedByAndCategoryType(PageUtils.buildSearch(search)
-                        , jwtUtils.getCurrentUserId(), Enum.valueOf(CategoryType.class, type))
+    public ContentResponse<Set<CategoryOutputDto>> getAllCategory(String search, String type, Long groupId) {
+        List<CategoryOutputDto> categoryOutputs = repository.findAllFiltered(PageUtils.buildSearch(search)
+                        , jwtUtils.getCurrentUserId(), Enum.valueOf(CategoryType.class, type), groupId)
                 .stream().map(categoryEntity -> mapper.convertToDto(categoryEntity)).collect(Collectors.toList());
 
         List<Long> logoIds = new ArrayList<>();

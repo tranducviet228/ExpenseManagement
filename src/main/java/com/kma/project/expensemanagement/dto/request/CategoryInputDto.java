@@ -23,4 +23,5 @@ public class CategoryInputDto {
 
     private String categoryType;
 
+    private Long groupId;
 }

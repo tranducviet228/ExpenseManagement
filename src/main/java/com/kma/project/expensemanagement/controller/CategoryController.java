@@ -49,14 +49,15 @@ public class CategoryController {
 
     @ApiOperation(value = "Lấy danh sách danh mục thu chi")
     @GetMapping
-    public PageResponse<CategoryOutputDto> getAllByParentId(Integer page, Integer size, String sort, String search, Long parentId) {
-        return categoryService.getAllCategoryByParentId(page, size, sort, search, parentId);
+    public PageResponse<CategoryOutputDto> getAllByParentId(Integer page, Integer size, String sort, String search,
+                                                            Long parentId, Long groupId) {
+        return categoryService.getAllCategoryByParentId(page, size, sort, search, parentId, groupId);
     }
 
 
     @ApiOperation(value = "Lấy tất cả danh mục thu chi")
     @GetMapping("/all")
-    public ContentResponse<Set<CategoryOutputDto>> getAll(String search, @RequestParam String type) {
-        return categoryService.getAllCategory(search, type);
+    public ContentResponse<Set<CategoryOutputDto>> getAll(String search, @RequestParam String type, Long groupId) {
+        return categoryService.getAllCategory(search, type, groupId);
     }
 }

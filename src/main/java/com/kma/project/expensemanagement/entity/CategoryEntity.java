@@ -32,4 +32,6 @@ public class CategoryEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "category_type")
     private CategoryType categoryType;
+
+    private Long groupId;
 }
