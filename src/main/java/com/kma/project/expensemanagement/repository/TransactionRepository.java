@@ -30,16 +30,17 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
     Page<TransactionEntity> findAllByCreatedByAndGroupId(Pageable pageable, Long createdById, Long groupId);
 
-    @Query(value = " select t from TransactionEntity t where " +
-            " t.ariseDate between :fromDate and :toDate and (t.wallet.id in :walletIds) and t.createdBy = :userId " +
-            " and (:groupId IS NULL OR t.groupId = :groupId)")
-    List<TransactionEntity> findAllTransactionByWalletId(LocalDateTime fromDate, LocalDateTime toDate, List<Long> walletIds,
-                                                         Long userId, Long groupId);
 
-//    @Query(value = " select sum(amount) as amount, DATE(arise_date) as createdAt from transactions t where " +
-//            " t.arise_date between :fromDate and :toDate and t.transaction_type = 'EXPENSE' " +
-//            " and t.created_by = :userId and (:groupId IS NULL OR t.group_id = :groupId) group by DATE(arise_date)", nativeQuery = true)
-//    List<AnalysisDetail> getTotalInWeek(LocalDateTime fromDate, LocalDateTime toDate, Long userId, Long groupId);
+    @Query("SELECT t FROM TransactionEntity t WHERE " +
+            "t.ariseDate BETWEEN :fromDate AND :toDate AND " +
+            "t.wallet.id IN :walletIds AND " +
+            "((:groupId IS NOT NULL AND t.groupId = :groupId) OR " +
+            "(:groupId IS NULL AND (t.createdBy = :userId OR t.groupId IS NOT NULL)))")
+    List<TransactionEntity> findAllTransactionByWalletId(@Param("fromDate") LocalDateTime fromDate,
+                                                         @Param("toDate") LocalDateTime toDate,
+                                                         @Param("walletIds") List<Long> walletIds,
+                                                         @Param("userId") Long userId,
+                                                         @Param("groupId") Long groupId);
 
     @Query(value = "SELECT SUM(amount) AS amount, DATE(arise_date) AS createdAt " +
             "FROM transactions t " +
