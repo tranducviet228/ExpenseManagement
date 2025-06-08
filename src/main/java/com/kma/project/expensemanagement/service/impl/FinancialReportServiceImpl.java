@@ -280,7 +280,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
         LocalDateTime fromDate;
         LocalDateTime toDate;
         categoryIds = categoryIds.isEmpty() ? categoryRepository
-                .getAllCategoryId(Enum.valueOf(CategoryType.class, type), jwtUtils.getCurrentUserId()) : categoryIds;
+                .getAllCategoryId(Enum.valueOf(CategoryType.class, type)) : categoryIds;
         walletIds = walletIds.isEmpty() ? walletRepository.getAllWalletId(jwtUtils.getCurrentUserId(), groupId) : walletIds;
         BigDecimal totalAmount = BigDecimal.ZERO;
         BigDecimal mediumAmount = BigDecimal.ZERO;

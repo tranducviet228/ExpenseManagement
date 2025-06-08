@@ -41,9 +41,8 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
                                          @Param("type") CategoryType type,
                                          @Param("groupId") Long groupId);
 
-    @Query(value = " select c.id from CategoryEntity c where c.categoryType = :categoryType and c.createdBy = :userId ")
-    List<Long> getAllCategoryId(@Param("categoryType") CategoryType categoryType,
-                                @Param("userId") Long userId);
+    @Query(value = " select c.id from CategoryEntity c where c.categoryType = :categoryType")
+    List<Long> getAllCategoryId(@Param("categoryType") CategoryType categoryType);
 
     @Query(value = " select * from categories c " +
             " join users u on c.created_by = u.id " +
