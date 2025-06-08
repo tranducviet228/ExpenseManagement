@@ -110,7 +110,6 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             "AND transaction_type = :tranType " +
             "AND wallet_id IN :walletIds " +
             "AND category_id IN :categoryIds " +
-            "AND created_by = :userId " +
             "AND group_id = :groupId " +
             "GROUP BY DATE(arise_date)", nativeQuery = true)
     List<AnalysisDetail> getDayAnalysisDetailWithGroupId(
@@ -119,7 +118,6 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             @Param("tranType") String tranType,
             @Param("walletIds") List<Long> walletIds,
             @Param("categoryIds") List<Long> categoryIds,
-            @Param("userId") Long userId,
             @Param("groupId") Long groupId
     );
 

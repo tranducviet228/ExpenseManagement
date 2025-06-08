@@ -297,7 +297,7 @@ public class FinancialReportServiceImpl implements FinancialReportService {
                         .collect(Collectors.toList());
             }else {
                 analysisDetail = transactionRepository
-                        .getDayAnalysisDetailWithGroupId(fromDate, toDate, type, walletIds, categoryIds, jwtUtils.getCurrentUserId(), groupId)
+                        .getDayAnalysisDetailWithGroupId(fromDate, toDate, type, walletIds, categoryIds, groupId)
                         .stream().sorted(Comparator.comparing(TransactionRepository.AnalysisDetail::getCreatedAt))
                         .collect(Collectors.toList());
             }
