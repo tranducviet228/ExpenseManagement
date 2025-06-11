@@ -16,13 +16,13 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-    @Query("SELECT w FROM CategoryEntity w " +
-            "LEFT JOIN GroupEntity g ON w.groupId = g.id " +
+    @Query("SELECT DISTINCT w FROM CategoryEntity w " +
+            "LEFT JOIN GroupMemberEntity g ON w.groupId = g.groupId " +
             "WHERE " +
             "(:parentId IS NULL OR w.parentId = :parentId) AND " +
             "(:search IS NULL OR LOWER(w.name) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
             "((:groupId IS NOT NULL AND w.groupId = :groupId) OR " +
-            "(:groupId IS NULL AND (w.createdBy = :createdBy OR w.groupId IS NOT NULL))) " +
+            "(:groupId IS NULL AND (w.createdBy = :createdBy OR (w.groupId IS NOT NULL AND g.userId = :createdBy)))) " +
             "ORDER BY w.createdAt")
     Page<CategoryEntity> findAllCombined(@Param("pageable") Pageable pageable,
                                          @Param("search") String search,

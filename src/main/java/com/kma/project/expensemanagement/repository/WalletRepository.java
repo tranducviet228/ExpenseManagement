@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -12,9 +13,12 @@ public interface WalletRepository extends JpaRepository<WalletEntity, Long> {
 
     Page<WalletEntity> findAllByCreatedBy(Pageable pageable, Long createdBy);
 
-    @Query(value = " select w from WalletEntity w left join GroupEntity g on w.groupId = g.id " +
-            "where (w.createdBy = :createdBy) or (w.groupId is not null) order by w.createdAt")
-    List<WalletEntity> findAllWallet(Long createdBy);
+    @Query("SELECT DISTINCT w FROM WalletEntity w " +
+            "LEFT JOIN GroupMemberEntity g ON w.groupId = g.groupId " +
+            "WHERE (w.createdBy = :createdBy) OR (w.groupId IS NOT NULL AND g.userId = :createdBy) " +
+            "ORDER BY w.createdAt")
+    List<WalletEntity> findAllWallet(@Param("createdBy") Long createdBy);
+
 
     @Query(value = " select w from WalletEntity w where (:groupId is not null and w.groupId = :groupId) order by w.createdAt")
     List<WalletEntity> findAllByGroupIdOrderByCreatedAt(Long groupId);
