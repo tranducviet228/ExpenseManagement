@@ -8,12 +8,14 @@ import com.kma.project.expensemanagement.dto.response.WalletInformationOutputDto
 import com.kma.project.expensemanagement.dto.response.WalletOutputDto;
 import com.kma.project.expensemanagement.entity.GroupEntity;
 import com.kma.project.expensemanagement.entity.GroupMemberEntity;
+import com.kma.project.expensemanagement.entity.TransactionEntity;
 import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.enums.RoleOfGroup;
 import com.kma.project.expensemanagement.exception.AppException;
 import com.kma.project.expensemanagement.mapper.WalletMapper;
 import com.kma.project.expensemanagement.repository.GroupMemberRepository;
 import com.kma.project.expensemanagement.repository.GroupRepository;
+import com.kma.project.expensemanagement.repository.TransactionRepository;
 import com.kma.project.expensemanagement.repository.WalletRepository;
 import com.kma.project.expensemanagement.security.jwt.JwtUtils;
 import com.kma.project.expensemanagement.service.WalletService;
@@ -41,6 +43,9 @@ public class WalletServiceImpl implements WalletService {
 
     @Autowired
     GroupRepository groupRepository;
+
+    @Autowired
+    TransactionRepository transactionRepository;
 
     @Autowired
     WalletMapper mapper;
@@ -85,6 +90,10 @@ public class WalletServiceImpl implements WalletService {
     public void delete(Long id) {
         WalletEntity walletEntity = repository.findById(id)
                 .orElseThrow(() -> AppException.builder().errorCodes(Collections.singletonList("error.wallet-not-found")).build());
+        List<TransactionEntity> transactionEntities = transactionRepository.findAllByWalletID(id);
+        if(!transactionEntities.isEmpty()){
+            throw AppException.builder().errorCodes(Collections.singletonList("error.wallet-has-transaction")).build();
+        }
         if(!walletEntity.getCreatedBy().equals(jwtUtils.getCurrentUserId())){
             throw AppException.builder().errorCodes(Collections.singletonList("error.user-not-permission")).build();
         }

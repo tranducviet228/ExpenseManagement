@@ -1,6 +1,7 @@
 package com.kma.project.expensemanagement.repository;
 
 import com.kma.project.expensemanagement.entity.TransactionEntity;
+import com.kma.project.expensemanagement.entity.WalletEntity;
 import com.kma.project.expensemanagement.enums.TransactionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +42,9 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
                                                          @Param("walletIds") List<Long> walletIds,
                                                          @Param("userId") Long userId,
                                                          @Param("groupId") Long groupId);
+
+    @Query("SELECT t FROM TransactionEntity t WHERE t.wallet.id = :walletId ")
+    List<TransactionEntity> findAllByWalletID(Long walletId);
 
     @Query(value = "SELECT SUM(amount) AS amount, DATE(arise_date) AS createdAt " +
             "FROM transactions t " +
